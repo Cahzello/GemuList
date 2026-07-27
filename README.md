@@ -8,7 +8,13 @@ Before setting up the project locally, ensure you have the following installed o
 - PHP (>= 8.3)
 - Composer
 - Node.js & NPM
-- MySQL Database
+- MySQL Databse
+
+**Check if prerequisites are installed:**
+- [How to verify PHP installation](https://www.php.net/manual/en/install.php)
+- [How to verify Composer installation](https://getcomposer.org/doc/00-intro.md#system-requirements)
+- [How to verify Node.js & NPM installation](https://nodejs.org/en/download/package-manager)
+- [How to verify SQLite installation](https://www.sqlite.org/cli.html)
 
 ## Local Development Setup
 
@@ -17,23 +23,28 @@ Follow these steps to build and run the application on your local machine:
 ### 1. Clone the repository
 
 `
-git clone <repository-url>
+git clone https://github.com/Cahzello/GemuList.git
+`
+
+### 2. Navigate into the project directory
+
+`
 cd GemuList
 `
 
-### 2. Install PHP dependencies
+### 3. Install PHP dependencies
 
 `
 composer install
 `
 
-### 3. Install JavaScript dependencies
+### 4. Install JavaScript dependencies
 
 `
 npm install
 `
 
-### 4. Set up the environment configuration
+### 5. Set up the environment configuration
 
 Copy the example .env file to create your own environment file:
 
@@ -41,13 +52,15 @@ Copy the example .env file to create your own environment file:
 cp .env.example .env
 `
 
-### 5. Generate the application key
+*(On Windows, use: copy .env.example .env)*
+
+### 6. Generate the application key
 
 `
 php artisan key:generate
 `
 
-### 6. Run database migrations
+### 7. Run database migrations
 
 Create the database structure. By default, Laravel uses an SQLite database located at database/database.sqlite:
 
@@ -55,7 +68,7 @@ Create the database structure. By default, Laravel uses an SQLite database locat
 php artisan migrate
 `
 
-### 7. Build the frontend assets
+### 8. Build the frontend assets
 
 Compile the Tailwind CSS and Vite assets:
 
@@ -69,7 +82,7 @@ For hot-reloading during development, run instead:
 npm run dev
 `
 
-### 8. Start the local development server
+### 9. Start the local development server
 
 `
 php artisan serve
