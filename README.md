@@ -10,12 +10,6 @@ Before setting up the project locally, ensure you have the following installed o
 - Node.js & NPM
 - MySQL Databse
 
-**Check if prerequisites are installed:**
-- [How to verify PHP installation](https://www.php.net/manual/en/install.php)
-- [How to verify Composer installation](https://getcomposer.org/doc/00-intro.md#system-requirements)
-- [How to verify Node.js & NPM installation](https://nodejs.org/en/download/package-manager)
-- [How to verify SQLite installation](https://www.sqlite.org/cli.html)
-
 ## Local Development Setup
 
 Follow these steps to build and run the application on your local machine:
