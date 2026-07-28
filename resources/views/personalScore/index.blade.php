@@ -1,0 +1,1 @@
+<h1>personal score view</h1>

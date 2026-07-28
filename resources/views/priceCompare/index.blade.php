@@ -8,12 +8,13 @@
     @vite(['resources/css/priceCompare.css', 'resources/js/db.js', 'resources/js/script.js'])
 </head>
 
-<body>
+<body style="margin: 0; padding: 0;">
+    <x-navbar />
 
-    <div class="page">
+    <div class="page" style="margin-top: 96px;">
 
         <header class="hero">
-            <h1 class="hero-title">Game Price Compare</h1>
+            <h1 class="hero-title">Price Compare</h1>
             <p class="hero-subtitle">Compare prices across all major digital stores. Find the best deals for your
                 favorite titles and save more on your gaming library.</p>
 
@@ -24,7 +25,7 @@
                     <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" />
                 </svg>
-                <input type="text" id="searchInput" placeholder="The Witcher" autocomplete="off">
+                <input type="text" id="searchInput" placeholder="Search Game..." autocomplete="off">
             </div>
         </header>
 
@@ -53,6 +54,8 @@
 
     <script src="db.js"></script>
     <script src="script.js"></script>
+
+    <x-footer />
 </body>
 
 </html>

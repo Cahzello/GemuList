@@ -26,20 +26,27 @@
 }
 
 body {
-    background: radial-gradient(ellipse 120% 80% at 50% -10%, #1a1030 0%, #0a0d1a 55%);
-    color: var(--text-primary);
-    /* Sesuai ROUTER.md section 5: Desktop dikunci setinggi 1 layar (100vh), tidak ada scroll halaman */
-    height: 100vh;
-    overflow: hidden;
-    padding: 40px 24px;
+	min-height: 100vh;
+	overflow-y: auto;
+	overflow-x: hidden;
+	margin: 0;
+	padding: 0;
+	background: linear-gradient(135deg, #0b0e1a 0%, #1a1f2e 100%);
+	background-attachment: fixed;
+	color: #fff;
+	font-family: 'Inter', sans-serif;
+	display: flex;
+	flex-direction: column;
 }
 
 .page {
     max-width: 900px;
     margin: 0 auto;
-    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    flex: 1;
+    padding-bottom: 24px;
 }
 
 /* ---------- Hero ---------- */
@@ -73,7 +80,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    max-width: 460px;
+    max-width: 550px;
     margin: 0 auto;
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -105,7 +112,6 @@ body {
     display: grid;
     grid-template-columns: 1fr 1.15fr;
     gap: 24px;
-    /* Sisa ruang dipakai content, dan elemen dalamnya yang scroll */
     flex: 1;
     min-height: 0;
 }
@@ -115,7 +121,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    /* Penting agar anak flex bisa overflow-y: auto */
+    height: 100%;
 }
 
 .panel-label {
@@ -136,7 +142,9 @@ body {
     gap: 12px;
     overflow-y: auto;
     padding-right: 8px;
-    /* ruang untuk scrollbar */
+    /* Maksimal 5 card: (56px tinggi card + 12px gap) * 5 - 12px gap terakhir ≈ 328px */
+    max-height: 500px;
+    flex: 1;
 }
 
 /* Custom scrollbar */
@@ -242,6 +250,8 @@ body {
     flex-direction: column;
     overflow-y: auto;
     padding-right: 4px;
+    max-height: 400px;
+    flex: 1;
 }
 
 .store-row {
@@ -344,50 +354,90 @@ body {
     color: var(--text-primary);
 }
 
-/* ---------- Responsive (Sesuai ROUTER.md section 5) ---------- */
+/* ---------- Responsive ---------- */
 
-@media (max-width: 720px) {
-
-    /* Mobile (<=720px): kedua kolom ditumpuk jadi satu, halaman boleh scroll */
-    body {
-        height: auto;
-        overflow: auto;
+/* Tablet */
+@media (max-width: 1024px) {
+    .page {
+        max-width: 100%;
+        padding: 32px 24px 24px;
     }
 
+    .content {
+        gap: 20px;
+    }
+}
+
+/* Mobile Landscape / Small Tablet */
+@media (max-width: 768px) {
     .page {
-        height: auto;
+        padding: 24px 20px 20px;
     }
 
     .content {
         grid-template-columns: 1fr;
-        display: flex;
-        flex-direction: column;
+        gap: 24px;
     }
 
-    .results-panel,
-    .store-panel {
-        min-height: auto;
-    }
-
-    /* Batasi tinggi maksimum agar tetap scroll di dalam kolom */
-    .results-list {
-        max-height: 400px;
-    }
-
-    .store-list {
-        max-height: 400px;
-    }
-}
-
-@media (max-width: 420px) {
-
-    /* Mobile kecil (<=420px): ukuran diperkecil */
     .hero-title {
-        font-size: 28px;
+        font-size: 32px;
     }
 
     .hero-subtitle {
         font-size: 13px;
+        max-width: 100%;
+    }
+
+    .search-bar {
+        max-width: 100%;
+    }
+
+    .results-list,
+    .store-list {
+        max-height: 350px;
+    }
+}
+
+/* Mobile Portrait */
+@media (max-width: 480px) {
+    .page {
+        padding: 20px 16px 16px;
+    }
+
+    .hero {
+        margin-bottom: 20px;
+    }
+
+    .hero-title {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .search-bar {
+        padding: 10px 14px;
+    }
+
+    .search-bar input {
+        font-size: 13px;
+    }
+
+    .content {
+        gap: 20px;
+    }
+
+    .panel-label {
+        font-size: 10px;
+        margin-bottom: 12px;
+    }
+
+    .result-card {
+        padding: 10px;
+        gap: 12px;
     }
 
     .result-thumb {
@@ -395,22 +445,97 @@ body {
         height: 48px;
     }
 
-    .result-card {
-        padding: 10px;
+    .result-title {
+        font-size: 13px;
+    }
+
+    .result-price {
+        font-size: 11px;
+    }
+
+    .store-card {
+        padding: 16px;
+    }
+
+    .store-game-title {
+        font-size: 15px;
+        margin-bottom: 12px;
     }
 
     .store-row {
+        padding: 12px 0;
         flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .store-name {
+        font-size: 13px;
+        width: auto;
+        flex: 1;
     }
 
     .store-price-container {
         order: 3;
         flex-basis: 100%;
-        padding-left: 24px;
-        margin-top: 4px;
+        padding-left: 0;
+        margin-top: 8px;
     }
 
-    .store-action {
-        margin-left: auto;
+    .store-price {
+        font-size: 13px;
+    }
+
+    .store-original-price {
+        font-size: 10px;
+    }
+
+    .store-action.button {
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+
+    .store-action.link {
+        font-size: 11px;
+    }
+
+    .results-list,
+    .store-list {
+        max-height: 300px;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+    .page {
+        padding: 16px 12px 12px;
+    }
+
+    .hero-title {
+        font-size: 24px;
+    }
+
+    .hero-subtitle {
+        font-size: 11px;
+    }
+
+    .search-bar {
+        padding: 8px 12px;
+    }
+
+    .result-card {
+        padding: 8px;
+    }
+
+    .result-thumb {
+        width: 44px;
+        height: 44px;
+    }
+
+    .store-card {
+        padding: 14px;
+    }
+
+    .store-row {
+        padding: 10px 0;
     }
 }
