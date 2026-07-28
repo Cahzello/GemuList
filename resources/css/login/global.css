@@ -1,0 +1,43 @@
+
+:root {
+	/* color variables */
+	--main-color: #820805;
+	--grey: #696969;
+
+	/* responsive margins / paddings */
+	--margin-sm: 16px;
+	--margin-md: 32px;
+}
+
+* {
+	--min-screen-size: 430;
+	--max-screen-size: 1920;
+	--interpolate-diff: calc(var(--max-font-size) - var(--min-font-size));
+	--interpolate: clamp(calc(var(--min-font-size) * 1px), calc((var(--min-font-size) * 1px) + var(--interpolate-diff) * ((100vw - calc(var(--min-screen-size) * 1px)) / (var(--max-screen-size) - var(--min-screen-size)))), calc(var(--max-font-size) * 1px));
+}
+
+html {
+	height: 100%;
+	font-size: 16px;
+}
+
+
+
+/* ui objects utility classes */
+
+.card {
+	display: flex;
+	align-items: flex-start;
+	background-color: #060e20;
+	padding: 18px 16px 18px 15px;
+	border: 1px solid #4a4455;
+	border-radius: 4px;
+}
+
+
+
+/* button hover utility classes */
+
+.hover-bright:hover {
+	filter: brightness(1.2);
+}
