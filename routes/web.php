@@ -8,6 +8,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/footer', function () {
+    return view('components.footer');
+});
+
 Route::get('/test', function () {
     return view('components.navbar');
 });
