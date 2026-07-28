@@ -119,6 +119,16 @@ function renderResults(search) {
         c.classList.toggle("selected", c.dataset.id === selectedId);
       });
       renderStore(game.id);
+      
+      // Smooth scroll to store panel on mobile
+      if (window.innerWidth <= 768) {
+        var storePanel = document.querySelector('.store-panel');
+        if (storePanel) {
+          setTimeout(function() {
+            storePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
+      }
     });
 
     list.appendChild(card);

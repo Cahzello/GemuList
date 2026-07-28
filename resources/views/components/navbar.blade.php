@@ -23,6 +23,12 @@
                 <p class="text3">Hi, {{ Auth::check() ? Auth::user()->name : 'User' }}!</p>
             </div>
         </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 
     <div class="mobile-menu" id="mobileMenu">

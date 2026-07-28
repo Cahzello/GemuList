@@ -140,15 +140,29 @@
 	display: none;
 	background: none;
 	border: none;
-	color: #9ca3af;
 	cursor: pointer;
 	padding: 8px;
 	flex-shrink: 0;
-	transition: color 0.2s ease;
+	width: 40px;
+	height: 40px;
+	position: relative;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
 }
 
-.mobile-menu-btn:hover {
-	color: #d2bbff;
+.mobile-menu-btn span {
+	display: block;
+	width: 24px;
+	height: 2px;
+	background-color: #9ca3af;
+	transition: all 0.3s ease;
+	border-radius: 2px;
+}
+
+.mobile-menu-btn:hover span {
+	background-color: #d2bbff;
 }
 
 .menu-icon {
@@ -248,12 +262,26 @@
 		display: none;
 	}
 
+	.navbar-user {
+		display: flex;
+		flex: 1;
+		justify-content: center;
+	}
+
 	.user-welcome {
-		display: none;
+		text-align: center;
+	}
+
+	.text2 {
+		font-size: 10px;
+	}
+
+	.text3 {
+		font-size: 12px;
 	}
 
 	.mobile-menu-btn {
-		display: block;
+		display: flex;
 	}
 
 	.mobile-menu {
