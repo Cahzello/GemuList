@@ -1,15 +1,6 @@
-// ============================================================
-//  LOGIC  –  Game Price Compare
-//  Data dibaca langsung dari db.js (variabel global `games`).
-//  Tidak memerlukan server – bisa berjalan langsung di browser.
-//  Nanti di Laravel, ganti sumber data dengan API Laravel.
-// ============================================================
-
 let selectedId = null;
 let debounceTimer = null;
 let isSearching = false;
-
-// ---------- Helpers ----------
 
 function formatRupiah(amount) {
   return "Rp " + amount.toLocaleString("id-ID");
@@ -28,8 +19,6 @@ function getStoreIcon(storeName) {
   }
   return "";
 }
-
-// ---------- Data (langsung dari db.js, tanpa fetch) ----------
 
 function getGames(search) {
   var q = (search || "").trim().toLowerCase();

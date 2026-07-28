@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Price Compare</title>
+    <title>Price Compare</title>
     @vite(['resources/css/priceCompare.css', 'resources/js/db.js', 'resources/js/script.js'])
 </head>
 
@@ -34,7 +34,6 @@
             <section class="results-panel">
                 <span class="panel-label">SEARCH RESULT</span>
                 <div class="results-list" id="resultsList">
-                    <!-- result cards injected by JS -->
                 </div>
             </section>
 
@@ -43,7 +42,6 @@
                 <div class="store-card">
                     <h2 class="store-game-title" id="storeGameTitle">—</h2>
                     <ul class="store-list" id="storeList">
-                        <!-- store rows injected by JS -->
                     </ul>
                 </div>
             </section>
