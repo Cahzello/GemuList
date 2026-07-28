@@ -8,6 +8,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/test', function () {
+    return view('components.navbar');
+});
+
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
