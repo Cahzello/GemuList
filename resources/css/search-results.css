@@ -1,0 +1,388 @@
+/* ==========================================================================
+   search-results.css
+   Section: Search Results (pakai style grid yang sama dengan GL06)
+   Font yang dipakai: Sora, Inter, JetBrains Mono
+   -> Import via Google Fonts di layout utama, contoh:
+   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+   PENTING: kalau file ini di-import di halaman yang SAMA dengan
+   game-search.css (dua-duanya dipakai bareng lewat index.blade.php),
+   blok :root di bawah boleh dihapus supaya tidak duplikat dengan punya
+   game-search.css.
+   ========================================================================== */
+
+:root {
+    --color-bg: #0B1325;
+    --color-surface: rgba(19, 27, 46, 0.6);
+    --color-border: rgba(149, 141, 161, 0.1);
+    --color-primary: #7C3AED;
+    --color-primary-text: #EDE0FF;
+    --color-accent: #C3F400;
+    --color-accent-dark: #161F00;
+    --color-accent-text: #ABD600;
+    --color-cyan: #00DBE9;
+    --color-cyan-border: rgba(0, 219, 233, 0.3);
+    --color-tag-bg: rgba(49, 57, 77, 0.4);
+    --color-tag-border: rgba(74, 68, 85, 0.3);
+    --color-text-heading: #FFFFFF;
+    --color-text-body: #CCC3D8;
+    --color-text-muted: #958DA1;
+    --color-text-placeholder: #4A4455;
+    --color-link: #D2BBFF;
+
+    --font-display: 'Sora', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+/* ==========================================================================
+   Global background - ensure dark theme covers entire viewport
+   ========================================================================== */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--color-bg);
+    min-height: 100vh;
+}
+
+}
+
+/* ==========================================================================
+   Section wrapper
+   ========================================================================== */
+
+.gl06 {
+    width: 100%;
+    background: var(--color-bg);
+    color: var(--color-text-heading);
+    padding: 95px 24px 80px;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Hero / Search
+   ========================================================================== */
+
+.gl06__hero {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 96px;
+}
+
+.gl06__hero-container {
+    width: 100%;
+    max-width: 768px;
+    text-align: center;
+}
+
+.gl06__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 52px;
+    letter-spacing: -0.96px;
+    color: var(--color-text-heading);
+    filter: drop-shadow(0px 0px 15px rgba(210, 187, 255, 0.3));
+}
+
+.gl06__subtitle-wrap {
+    margin-top: 16px;
+}
+
+.gl06__subtitle {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--color-text-body);
+}
+
+.gl06__search {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 768px;
+    margin: 48px auto 0;
+    padding: 9px 5px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0px 0px 40px rgba(124, 58, 237, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+}
+
+.gl06__search-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 12px;
+    color: var(--color-text-muted);
+}
+
+.gl06__search-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.gl06__search-input {
+    flex: 1;
+    min-width: 0;
+    height: 60px;
+    padding: 0 12px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 25px;
+    color: var(--color-text-heading);
+}
+
+.gl06__search-input::placeholder {
+    color: var(--color-text-placeholder);
+}
+
+.gl06__search-btn {
+    flex-shrink: 0;
+    height: 60px;
+    padding: 0 32px;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    color: var(--color-primary-text);
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+
+.gl06__search-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* ==========================================================================
+   Results header
+   ========================================================================== */
+
+.gl06__trending {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.gl06__trending-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.gl06__trending-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: var(--color-text-heading);
+}
+
+.gl06__trending-subtitle {
+    margin: 4px 0 0;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--color-text-body);
+}
+
+.gl06__view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 14px;
+    letter-spacing: 0.7px;
+    color: var(--color-link);
+    transition: opacity 0.15s ease;
+}
+
+.gl06__view-all:hover {
+    opacity: 0.8;
+}
+
+.gl06__view-all svg {
+    width: 20px;
+    height: 12px;
+}
+
+/* ==========================================================================
+   Empty state (tidak ada hasil pencarian)
+   ========================================================================== */
+
+.gl06__empty {
+    padding: 48px 24px;
+    text-align: center;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-body);
+    font-family: var(--font-body);
+    font-size: 16px;
+}
+
+/* ==========================================================================
+   Game grid & card
+   Max 5 kolom per baris — card ke-6 dst otomatis wrap ke baris baru
+   berkat CSS Grid (repeat(5, 1fr)), tidak perlu logic tambahan di Blade.
+   ========================================================================== */
+
+.gl06__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20.8px;
+}
+
+.game-card {
+    box-sizing: border-box;
+    background: var(--color-surface);
+    border-width: 1px 1px 1px 4px;
+    border-style: solid;
+    border-color: var(--color-border);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 58, 237, 0.5);
+}
+
+.game-card__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 224 / 298;
+    margin: 1px 4px 0;
+    width: calc(100% - 8px);
+    overflow: hidden;
+}
+
+.game-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.game-card__media-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, #060E20 0%, rgba(6, 14, 32, 0) 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+.game-card__body {
+    padding: 16px;
+}
+
+.game-card__title {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--color-text-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-card__tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.game-card__tag {
+    box-sizing: border-box;
+    padding: 3px 9px;
+    background: var(--color-tag-bg);
+    border: 1px solid var(--color-tag-border);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 15px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-text-body);
+}
+
+.game-card__tag--primary {
+    border-color: var(--color-cyan-border);
+    color: var(--color-cyan);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+    .gl06__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .gl06__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gl06 {
+        padding: 48px 16px 56px;
+    }
+
+    .gl06__title {
+        font-size: 36px;
+        line-height: 40px;
+    }
+
+    .gl06__search {
+        flex-wrap: wrap;
+    }
+
+    .gl06__search-input {
+        width: 100%;
+        order: 3;
+        height: 48px;
+    }
+
+    .gl06__search-btn {
+        width: 100%;
+        order: 4;
+    }
+}
+
+@media (max-width: 480px) {
+    .gl06__grid {
+        grid-template-columns: 1fr;
+    }
+}
