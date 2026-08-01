@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin 'daisyui';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,4 +7,27 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    
+    /* Custom colors for auth pages */
+    --color-purple-primary: #7c3aed;
+    --color-lime-accent: #c3f400;
+    --color-dark-bg: #0b1325;
+    --color-card-bg: rgba(19, 27, 46, 0.6);
+    --color-input-bg: #060e20;
+    --color-border: #4a4455;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #ccc3d8;
+    --color-text-muted: #958da1;
+    --color-text-accent: #d2bbff;
+}
+
+/* Custom utilities */
+@layer utilities {
+    .hover-bright:hover {
+        filter: brightness(1.2);
+    }
+    
+    .backdrop-blur-auth {
+        backdrop-filter: blur(10px);
+    }
 }
