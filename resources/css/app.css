@@ -1,9 +1,48 @@
-@import 'tailwindcss';
+﻿@import "tailwindcss";
+@source "../views";
+@source "../**/*.js";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/* @theme {
+    --color-primary: #0F2B3C;
+    --color-secondary: #E8A838;
+    --color-accent: #7EC8C8;
+    --color-surface: #D4ECEC;
+    --color-input: #07161F;
+    --color-input-border: #2A5A74;
+    --color-muted: #8EA6B4;
+    --color-success: #16a34a;
+    --color-warning: #f59e0b;
+    --color-danger: #dc2626;
+} */
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Brand */
+    --color-primary: #1E1E1E ;
+    --color-secondary: #FF6B35;
+
+    /* UI */
+    --color-accent: #F4F4F4;
+    --color-surface: #F4F4F4;
+    --color-input: #2A2A2A;
+    --color-muted: #8A8A8A;
+
+    /* Feedback */
+    --color-success: #16a34a;
+    --color-warning: #f59e0b;
+    --color-danger: #dc2626;
+    --color-background: #141414;
+}
+
+/* Custom utilities */
+@layer utilities {
+    .hover-bright:hover {
+        filter: brightness(1.2);
+    }
+
+    .backdrop-blur-auth {
+        backdrop-filter: blur(10px);
+    }
 }
