@@ -1,0 +1,655 @@
+/* ==========================================================================
+   detailgame.css
+   Section: Detail Game (GL10)
+   Color Palette:
+   - Background: #141414 (Pure dark with grey gradient)
+   - Cards: #1E1E1E (Dark grey)
+   - Primary Accent: #FF6B35 (Vibrant orange)
+   - Secondary Accent: #FF9F1C (Gold orange)
+   - Text: #F4F4F4 (Clean white)
+   ========================================================================== */
+
+:root {
+    --gl10-bg: #141414;
+    --gl10-purple: #FF6B35;
+    --gl10-cyan: #FF9F1C;
+    --gl10-lime: #FF9F1C;
+    --gl10-text-main: #F4F4F4;
+    --gl10-text-body: #D0D0D0;
+    --gl10-text-muted: #A0A0A0;
+}
+
+body.gl10-body {
+    margin: 0;
+    padding: 0;
+    background-color: #141414;
+    background-image: 
+        radial-gradient(circle at 5% 35%, rgba(255, 107, 53, 0.22) 0%, rgba(255, 107, 53, 0) 45%),
+        radial-gradient(circle at 95% 65%, rgba(255, 159, 28, 0.20) 0%, rgba(255, 159, 28, 0) 45%),
+        linear-gradient(180deg, #141414 0%, #1A1A1A 100%);
+    background-attachment: fixed;
+    color: var(--gl10-text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    position: relative;
+}
+
+body.gl10-body::before {
+    content: '';
+    position: fixed;
+    top: 15%;
+    left: -120px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.3) 0%, rgba(255, 107, 53, 0) 70%);
+    filter: blur(70px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body.gl10-body::after {
+    content: '';
+    position: fixed;
+    bottom: 15%;
+    right: -120px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 159, 28, 0.25) 0%, rgba(255, 159, 28, 0) 70%);
+    filter: blur(70px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.gl10 {
+    min-height: 100vh;
+    background: transparent;
+    color: var(--gl10-text-main);
+    padding: 40px 80px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    overflow-x: hidden;
+}
+
+@media (max-width: 1024px) {
+    .gl10 {
+        padding: 30px 20px;
+    }
+}
+
+/* ================= NAV / BACK BUTTON ================= */
+.gl10__nav {
+    position: absolute;
+    top: 40px;
+    left: 80px;
+    z-index: 10;
+}
+
+@media (max-width: 1024px) {
+    .gl10__nav {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 24px;
+    }
+}
+
+.gl10__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--gl10-text-muted);
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.gl10__back:hover {
+    color: #F4F4F4;
+    transform: translateX(-4px);
+}
+
+.gl10__back-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ================= MAIN CONTENT LAYOUT (CENTERED) ================= */
+.gl10__main {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: auto;
+    width: 100%;
+    padding: 40px 0;
+}
+
+@media (max-width: 1024px) {
+    .gl10__main {
+        flex-direction: column;
+        gap: 36px;
+        align-items: center;
+        text-align: center;
+        margin: 20px auto;
+    }
+}
+
+/* ================= LEFT COLUMN: MEDIA SHOWCASE (LOGO BOX) ================= */
+.gl10__media {
+    position: relative;
+    width: 350px;
+    height: 350px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 540px) {
+    .gl10__media {
+        width: 280px;
+        height: 280px;
+    }
+}
+
+/* Outer Gradient Glow Accent */
+.gl10__accent-glow {
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(90deg, #FF6B35 0%, #FF9F1C 100%);
+    opacity: 0.35;
+    filter: blur(5px);
+    border-radius: 14.72px;
+    pointer-events: none;
+}
+
+/* Canvas Area */
+.gl10__canvas {
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #1E1E1E;
+    border: 1px solid rgba(255, 107, 53, 0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 14.72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.gl10__cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.gl10__wireframe-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.gl10__showcase-label {
+    position: relative;
+    z-index: 2;
+    font-family: 'Sora', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 22px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(244, 244, 244, 0.5);
+    text-align: center;
+}
+
+/* Floating Accent Blurs */
+.gl10__blur-cyan {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: -20px;
+    top: -20px;
+    background: #FF9F1C;
+    mix-blend-mode: screen;
+    opacity: 0.25;
+    filter: blur(25px);
+    border-radius: 9198px;
+    pointer-events: none;
+}
+
+.gl10__blur-lime {
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    right: -18px;
+    bottom: -18px;
+    background: #FF6B35;
+    mix-blend-mode: screen;
+    opacity: 0.25;
+    filter: blur(25px);
+    border-radius: 9198px;
+    pointer-events: none;
+}
+
+/* ================= RIGHT COLUMN: INFO & TEXT (TOP & BOTTOM ALIGNED) ================= */
+.gl10__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 350px;
+    max-width: 650px;
+    box-sizing: border-box;
+    padding-top: 0;
+}
+
+@media (max-width: 1024px) {
+    .gl10__info {
+        height: auto;
+        align-items: center;
+    }
+}
+
+.gl10__title {
+    margin: -4px 0 16px 0;
+    font-family: 'Sora', sans-serif;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: #FF6B35;
+}
+
+@media (max-width: 768px) {
+    .gl10__title {
+        font-size: 36px;
+        line-height: 44px;
+        margin-top: 0;
+    }
+}
+
+.gl10__description {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 30px;
+    color: #D0D0D0;
+}
+
+@media (max-width: 768px) {
+    .gl10__description {
+        font-size: 16px;
+        line-height: 26px;
+    }
+}
+
+/* Primary Action Button (Bottom Aligned) */
+.gl10__action {
+    display: flex;
+    margin-top: auto;
+}
+
+@media (max-width: 1024px) {
+    .gl10__action {
+        margin-top: 24px;
+    }
+}
+
+.gl10__btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    min-width: 150px;
+    min-height: 48px;
+    background: #FF6B35;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Sora', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 22px;
+    color: #FFFFFF;
+    cursor: pointer;
+    box-shadow: 0px 10px 20px -3px rgba(255, 107, 53, 0.4),
+                0px 4px 6px -4px rgba(255, 107, 53, 0.3);
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gl10__btn-primary:hover {
+    background-color: #E55A27;
+    transform: translateY(-2px);
+    box-shadow: 0px 14px 25px -3px rgba(255, 107, 53, 0.5),
+                0px 6px 8px -4px rgba(255, 107, 53, 0.4);
+}
+
+.gl10__btn-primary:active {
+    transform: translateY(0);
+}
+
+.gl10__btn-primary:disabled,
+.gl10__btn-primary.is-added {
+    background: #FF6B35;
+    opacity: 0.8;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none !important;
+}
+
+/* ==========================================================================
+   GL10 MODAL / POPUP (ADD TO MY GAMES) - FIGMA SPECIFICATIONS
+   ========================================================================== */
+
+.gl10-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: transparent;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 80px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+    .gl10-modal-backdrop {
+        padding: 30px 20px;
+        align-items: center;
+    }
+}
+
+.gl10-modal-backdrop.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mirror Layout Container */
+.gl10-modal-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: auto;
+    width: 100%;
+    padding: 40px 0;
+}
+
+@media (max-width: 1024px) {
+    .gl10-modal-layout {
+        flex-direction: column;
+        gap: 36px;
+        align-items: center;
+        margin: 20px auto;
+    }
+}
+
+.gl10-modal-dummy-media {
+    width: 350px;
+    height: 350px;
+    flex-shrink: 0;
+    visibility: hidden;
+}
+
+@media (max-width: 1024px) {
+    .gl10-modal-dummy-media {
+        display: none;
+    }
+}
+
+.gl10-modal-info-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 650px;
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .gl10-modal-info-column {
+        align-items: center;
+    }
+}
+
+.gl10-modal {
+    box-sizing: border-box;
+    width: 360px;
+    max-width: 90vw;
+    background: rgba(30, 30, 30, 0.92);
+    border: 1px solid rgba(255, 159, 28, 0.35);
+    box-shadow: 0px 20px 40px -10px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 8px;
+    overflow: visible;
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gl10-modal-backdrop.is-active .gl10-modal {
+    transform: scale(1) translateY(0);
+}
+
+/* MODAL HEADER */
+.gl10-modal__header {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    padding: 0 20px;
+    background: rgba(40, 40, 40, 0.8);
+    border-bottom: 1px solid rgba(255, 159, 28, 0.2);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.gl10-modal__title {
+    margin: 0;
+    font-family: 'Sora', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 24px;
+    color: #FF9F1C;
+    display: flex;
+    align-items: center;
+}
+
+.gl10-modal__close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #D0D0D0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.gl10-modal__close:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.gl10-modal__close svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* MODAL BODY */
+.gl10-modal__body {
+    box-sizing: border-box;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.gl10-modal__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gl10-modal__label {
+    font-family: 'Sora', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: #F4F4F4;
+    display: flex;
+    align-items: center;
+}
+
+/* CUSTOM SELECT DROPDOWN COMPONENT */
+.gl10-select-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.gl10-select-trigger {
+    box-sizing: border-box;
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    background: #1E1E1E;
+    border: 1px solid rgba(255, 107, 53, 0.35);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #F4F4F4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gl10-select-trigger:focus,
+.gl10-select-wrap.is-open .gl10-select-trigger {
+    border-color: #FF6B35;
+    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.3);
+}
+
+.gl10-select-icon {
+    color: #D0D0D0;
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+}
+
+.gl10-select-wrap.is-open .gl10-select-icon {
+    transform: rotate(180deg);
+}
+
+.gl10-select-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    background: #1E1E1E;
+    border: 1px solid rgba(255, 107, 53, 0.4);
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.gl10-select-wrap.is-open .gl10-select-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.gl10-select-option {
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #D0D0D0;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.gl10-select-option:hover {
+    background: rgba(255, 107, 53, 0.25);
+    color: #FFFFFF;
+}
+
+.gl10-select-option.is-selected {
+    background: #FF6B35;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+/* MODAL SUBMIT BUTTON */
+.gl10-modal__btn {
+    box-sizing: border-box;
+    width: 100%;
+    height: 42px;
+    background: #FF6B35;
+    box-shadow: 0px 0px 20px rgba(255, 107, 53, 0.35);
+    border-radius: 4px;
+    border: none;
+    font-family: 'Sora', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 22px;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gl10-modal__btn:hover {
+    background-color: #E55A27;
+    box-shadow: 0px 0px 25px rgba(255, 107, 53, 0.5);
+    transform: translateY(-1px);
+}
+
+.gl10-modal__btn:active {
+    transform: translateY(0);
+}
