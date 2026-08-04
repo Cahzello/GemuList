@@ -1,0 +1,166 @@
+/* Price Compare Page - Custom Styles */
+
+/* Background Gradients */
+body.price-compare-page {
+    background:
+        radial-gradient(circle 500px at 0% 0%, rgba(255, 107, 53, 0.2), transparent),
+        radial-gradient(circle 450px at 100% 100%, rgba(255, 159, 28, 0.18), transparent),
+        #141414;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(90deg, #FF6B35 0%, #FF9F1C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.5rem;
+}
+
+.page-description {
+    color: #C0C0C0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    max-width: 500px;
+    margin: 0 auto 1rem;
+}
+
+@media (min-width: 768px) {
+    .page-title {
+        font-size: 1.875rem;
+    }
+    
+    .page-description {
+        font-size: 0.875rem;
+    }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    margin: 4px 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 107, 53, 0.3);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 107, 53, 0.5);
+    background-clip: padding-box;
+}
+
+/* Search Bar Focus State */
+.search-container:focus-within {
+    border-color: #FF6B35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.search-container:focus-within .search-icon {
+    color: #FF6B35;
+}
+
+/* Mobile Tab Buttons */
+.mobile-tabs {
+    display: none;
+}
+
+.mobile-tabs .tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #1E1E1E;
+    border: 2px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #C0C0C0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobile-tabs .tab-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.mobile-tabs .tab-btn:hover {
+    border-color: #3a3a3a;
+}
+
+.mobile-tabs .tab-btn.active {
+    border-color: #FF6B35;
+    color: #FF6B35;
+    background: linear-gradient(90deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.05));
+}
+
+@media (max-width: 768px) {
+    .mobile-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 0 8px;
+    }
+}
+
+/* Desktop Card Widths */
+@media (min-width: 769px) {
+    .results-panel .flex.items-center.gap-3\.5 {
+        padding: 16px !important;
+    }
+    
+    .results-panel img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr !important;
+    }
+
+    .results-panel,
+    .store-panel {
+        display: none;
+        max-height: 600px !important;
+    }
+
+    .results-panel.active,
+    .store-panel.active {
+        display: flex;
+    }
+
+    .results-list,
+    #storeList {
+        max-height: 500px;
+    }
+}
