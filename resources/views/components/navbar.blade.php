@@ -18,9 +18,20 @@
         </div>
 
         <div class="navbar-user">
-            <div class="user-welcome">
+            <div class="user-welcome" id="userDropdownToggle">
                 <p class="text2">Welcome back,</p>
                 <p class="text3">Hi, {{ Auth::check() ? Auth::user()->name : 'User' }}!</p>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -44,5 +55,21 @@
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
         mobileMenuBtn?.addEventListener('click', () => mobileMenu?.classList.toggle('active'));
+
+        // User dropdown toggle
+        const userToggle = document.getElementById('userDropdownToggle');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        userToggle?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown?.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!userToggle?.contains(e.target) && !userDropdown?.contains(e.target)) {
+                userDropdown?.classList.remove('active');
+            }
+        });
     });
 </script>
