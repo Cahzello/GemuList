@@ -26,7 +26,15 @@ Route::get('/personal-score', function () {
 
 Route::get('/navbar', function () {
     return view('components.navbar');
-});
+})->name('games.index');
+
+Route::get('/search', function () {
+    return view('search.index');
+})->name('games.search');
+
+Route::get('/search/detail', function () {
+    return view('search.detail-game');
+})->name('games.detail');
 
 Route::get('/footer', function () {
     return view('components.footer');
