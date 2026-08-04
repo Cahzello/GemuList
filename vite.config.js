@@ -7,8 +7,10 @@ export default defineConfig({
         tailwindcss(),
         laravel({
             input: [
-                'resources/css/app.css',
+                'resources/css/app.css', 
                 'resources/js/app.js',
+                'resources/js/dbPriceCompare.js',
+                'resources/js/priceCompare.js'
             ],
             refresh: true,
         }),
