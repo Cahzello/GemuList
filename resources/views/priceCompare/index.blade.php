@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Price Compare</title>
-    @vite(['resources/css/app.css', 'resources/css/priceCompare.css', 'resources/js/db.js', 'resources/js/script.js'])
+    @vite(['resources/css/app.css', 'resources/css/priceCompare.css', 'resources/js/dbPriceCompare.js', 'resources/js/priceCompare.js'])
 </head>
 
 <body class="price-compare-page min-h-screen text-neutral-50 p-6 md:p-10">
@@ -73,8 +73,8 @@
 
     </div>
 
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    <script src="dbPriceCompare.js"></script>
+    <script src="priceCompare.js"></script>
 </body>
 
 </html>

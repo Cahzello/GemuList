@@ -1,10 +1,3 @@
-// ============================================================
-//  LOGIC  –  Game Price Compare
-//  Data dibaca langsung dari db.js (variabel global `games`).
-//  Tidak memerlukan server – bisa berjalan langsung di browser.
-//  Nanti di Laravel, ganti sumber data dengan API Laravel.
-// ============================================================
-
 let selectedId = null;
 let debounceTimer = null;
 
