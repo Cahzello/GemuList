@@ -1,14 +1,6 @@
-// ============================================================
-//  LOGIC  –  Game Price Compare
-//  Data dibaca langsung dari db.js (variabel global `games`).
-//  Tidak memerlukan server – bisa berjalan langsung di browser.
-//  Nanti di Laravel, ganti sumber data dengan API Laravel.
-// ============================================================
-
 let selectedId = null;
 let debounceTimer = null;
-
-// ---------- Helpers ----------
+let isSearching = false;
 
 function formatRupiah(amount) {
   return "Rp " + amount.toLocaleString("id-ID");
@@ -28,13 +20,17 @@ function getStoreIcon(storeName) {
   return "";
 }
 
-// ---------- Data (langsung dari db.js, tanpa fetch) ----------
-
 function getGames(search) {
   var q = (search || "").trim().toLowerCase();
   var dbGames = window.games || [];
-  return dbGames
-    .filter(function (g) { return g.title.toLowerCase().includes(q); })
+  
+  // Filter berdasarkan search query
+  var filtered = q 
+    ? dbGames.filter(function (g) { return g.title.toLowerCase().includes(q); })
+    : dbGames;
+  
+  // Sort ascending by title (A-Z)
+  return filtered
     .map(function (g) {
       return {
         id:          g.id,
@@ -42,6 +38,9 @@ function getGames(search) {
         thumbnail:   g.thumbnail,
         lowestPrice: Math.min.apply(null, g.stores.map(function (s) { return s.price; }))
       };
+    })
+    .sort(function (a, b) {
+      return a.title.localeCompare(b.title);
     });
 }
 
@@ -49,7 +48,22 @@ function getStoresForGame(gameId) {
   var dbGames = window.games || [];
   var game = dbGames.find(function (g) { return g.id === gameId; });
   if (!game) return null;
-  return { id: game.id, title: game.title, stores: game.stores };
+  
+  // Sort stores by price ascending
+  var sortedStores = game.stores.slice().sort(function (a, b) {
+    return a.price - b.price;
+  });
+  
+  return { id: game.id, title: game.title, stores: sortedStores };
+}
+
+// ---------- Update Panel Label ----------
+
+function updatePanelLabel() {
+  var labelEl = document.querySelector('.panel-label');
+  if (labelEl) {
+    labelEl.textContent = isSearching ? 'SEARCH RESULT' : 'ALL GAMES';
+  }
 }
 
 // ---------- Render: Search Results ----------
@@ -57,6 +71,10 @@ function getStoresForGame(gameId) {
 function renderResults(search) {
   var list = document.getElementById("resultsList");
   var gameList = getGames(search);
+  
+  // Update isSearching state
+  isSearching = search && search.trim().length > 0;
+  updatePanelLabel();
 
   list.innerHTML = "";
 
@@ -65,10 +83,11 @@ function renderResults(search) {
     return;
   }
 
-  // Auto-select game pertama kalau belum ada yang dipilih
-  if (!selectedId || !gameList.find(function (g) { return g.id === selectedId; })) {
-    selectedId = gameList[0].id;
-    renderStore(selectedId);
+  // Jangan auto-select, biarkan user memilih sendiri
+  // Reset selection jika game yang dipilih tidak ada di hasil
+  if (selectedId && !gameList.find(function (g) { return g.id === selectedId; })) {
+    selectedId = null;
+    clearStore();
   }
 
   gameList.forEach(function (game) {
@@ -89,10 +108,29 @@ function renderResults(search) {
         c.classList.toggle("selected", c.dataset.id === selectedId);
       });
       renderStore(game.id);
+      
+      // Smooth scroll to store panel on mobile
+      if (window.innerWidth <= 768) {
+        var storePanel = document.querySelector('.store-panel');
+        if (storePanel) {
+          setTimeout(function() {
+            storePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
+      }
     });
 
     list.appendChild(card);
   });
+}
+
+// ---------- Clear Store Panel ----------
+
+function clearStore() {
+  var titleEl   = document.getElementById("storeGameTitle");
+  var storeList = document.getElementById("storeList");
+  titleEl.textContent  = "—";
+  storeList.innerHTML  = '<li style="color:var(--text-muted);font-size:13px;padding:8px 0;">Select a game to view available stores.</li>';
 }
 
 // ---------- Render: Store Panel ----------
@@ -158,3 +196,4 @@ document.getElementById("searchInput").addEventListener("input", function () {
 // ---------- Init ----------
 
 renderResults("");
+clearStore();
