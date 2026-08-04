@@ -2,8 +2,10 @@
 .footer-container {
 	width: 100%;
 	margin-top: auto;
-	background-color: #0f1726;
-	border-top: 1px solid #1e293b;
+	background-color: rgba(10, 10, 10, 0.95);
+	backdrop-filter: blur(10px);
+	border-top: 1px solid rgba(42, 42, 42, 0.3);
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .footer-content {
@@ -22,7 +24,10 @@
 }
 
 .footer-title {
-	color: #d2bbff;
+	background: linear-gradient(90deg, #FF6B35 0%, #FF9F1C 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
 	font-size: 28px;
 	font-family: 'Sora', sans-serif;
 	font-weight: 800;
@@ -40,7 +45,7 @@
 }
 
 .footer-tagline {
-	color: #CCC3D8;
+	color: #C0C0C0;
 	font-size: 14px;
 	font-family: 'Inter', sans-serif;
 	font-weight: 400;
@@ -49,7 +54,7 @@
 }
 
 .footer-copyright {
-	color: #C3F400;
+	color: #FF9F1C;
 	font-size: 12px;
 	font-family: 'Inter', sans-serif;
 	font-weight: 400;
