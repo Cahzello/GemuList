@@ -65,20 +65,327 @@ body.price-compare-page {
     color: #FF6B35;
 }
 
-/* Mobile Panel Visibility */
-@media (max-width: 768px) {
-    .results-panel, 
-    .store-panel {
-        display: none;
+/* ---------- Responsive ---------- */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .page {
+        max-width: 100%;
+        padding: 32px 24px 24px;
     }
-    
-    .results-panel.active, 
-    .store-panel.active {
-        display: flex;
+
+    .content {
+        gap: 20px;
+    }
+}
+
+/* Mobile Landscape / Small Tablet */
+@media (max-width: 768px) {
+    .page {
+        padding: 24px 20px 20px;
+    }
+
+    .content {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-subtitle {
+        font-size: 13px;
+        max-width: 100%;
+    }
+
+    .search-bar {
+        max-width: 100%;
     }
     
     .results-list, 
     #storeList {
         max-height: 400px;
+    }
+}
+
+/* Mobile Portrait */
+@media (max-width: 480px) {
+    .page {
+        padding: 20px 16px 16px;
+    }
+
+    .hero {
+        margin-bottom: 20px;
+    }
+
+    .hero-title {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .search-bar {
+        padding: 10px 14px;
+    }
+
+    .search-bar input {
+        font-size: 13px;
+    }
+
+    .content {
+        gap: 20px;
+    }
+
+    .panel-label {
+        font-size: 10px;
+        margin-bottom: 12px;
+    }
+
+    .result-card {
+        padding: 10px;
+        gap: 12px;
+    }
+
+    .result-thumb {
+        width: 48px;
+        height: 48px;
+    }
+
+    .result-title {
+        font-size: 13px;
+    }
+
+    .result-price {
+        font-size: 11px;
+    }
+
+    .store-card {
+        padding: 16px;
+    }
+
+    .store-game-title {
+        font-size: 15px;
+        margin-bottom: 12px;
+    }
+
+    .store-row {
+        padding: 12px 0;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .store-name {
+        font-size: 13px;
+        width: auto;
+        flex: 1;
+    }
+
+    .store-price-container {
+        order: 3;
+        flex-basis: 100%;
+        padding-left: 0;
+        margin-top: 8px;
+    }
+
+    .store-price {
+        font-size: 13px;
+    }
+
+    .store-original-price {
+        font-size: 10px;
+    }
+
+    .store-action.button {
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+
+    .store-action.link {
+        font-size: 11px;
+    }
+
+    .results-list,
+    .store-list {
+        max-height: 300px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .page {
+        padding: 0 8px 12px;
+    }
+
+    .hero {
+        margin-bottom: 16px;
+    }
+
+    .hero-title {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+        font-size: 12px;
+        padding: 0 4px;
+        line-height: 1.5;
+    }
+
+    .search-bar {
+        padding: 9px 12px;
+        gap: 8px;
+    }
+
+    .search-bar input {
+        font-size: 13px;
+    }
+
+    .content {
+        gap: 12px;
+    }
+
+    .panel-label {
+        font-size: 10px;
+        letter-spacing: 1.2px;
+        margin-bottom: 10px;
+    }
+
+    .results-list,
+    .store-list {
+        max-height: 280px;
+    }
+
+    .result-card {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .result-thumb {
+        width: 48px;
+        height: 48px;
+    }
+
+    .result-title {
+        font-size: 12px;
+    }
+
+    .result-price {
+        font-size: 10px;
+    }
+
+    .store-card {
+        padding: 12px;
+    }
+
+    .store-game-title {
+        font-size: 15px;
+        margin-bottom: 14px;
+    }
+
+    .store-row {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 0;
+        gap: 8px;
+    }
+
+    .store-name {
+        font-size: 12px;
+        min-width: auto;
+        width: 100%;
+    }
+
+    .store-price-container {
+        width: 100%;
+    }
+
+    .store-price {
+        font-size: 13px;
+    }
+
+    .store-original-price {
+        font-size: 10px;
+    }
+
+    .store-discount {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+
+    .store-action {
+        width: 100%;
+        text-align: center;
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+    .page {
+        padding: 0 6px 10px;
+    }
+
+    .hero-title {
+        font-size: 22px;
+    }
+
+    .hero-subtitle {
+        font-size: 11px;
+    }
+
+    .search-bar {
+        padding: 8px 10px;
+    }
+
+    .search-bar input {
+        font-size: 12px;
+    }
+
+    .result-card {
+        padding: 7px;
+    }
+
+    .result-thumb {
+        width: 44px;
+        height: 44px;
+    }
+
+    .result-title {
+        font-size: 11px;
+    }
+
+    .result-price {
+        font-size: 9px;
+    }
+
+    .store-card {
+        padding: 10px;
+    }
+
+    .store-game-title {
+        font-size: 14px;
+    }
+
+    .store-row {
+        padding: 8px 0;
+    }
+
+    .store-name {
+        font-size: 11px;
+    }
+
+    .store-price {
+        font-size: 12px;
+    }
+
+    .store-action {
+        font-size: 10px;
+        padding: 7px 10px;
     }
 }
