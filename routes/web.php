@@ -58,3 +58,7 @@ Route::post('/logout', function () {
 
     return redirect('/');
 })->middleware('auth')->name('logout');
+
+Route::get('/my-games-gl', function () {
+    return view('myGames.index');
+});

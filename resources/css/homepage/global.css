@@ -23,15 +23,10 @@ html {
 
 
 
-/* ui objects utility classes */
+/* text utility classes */
 
-.card {
-	display: flex;
-	align-items: flex-start;
-	background-color: #060e20;
-	padding: 18px 16px 18px 15px;
-	border: 1px solid #4a4455;
-	border-radius: 4px;
+.sub-text {
+	color: #8b5cf6;
 }
 
 
@@ -40,4 +35,8 @@ html {
 
 .hover-bright:hover {
 	filter: brightness(1.2);
+}
+
+.hover-zoom:hover {
+	scale: 1.05;
 }
