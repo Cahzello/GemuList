@@ -113,8 +113,8 @@ function renderResults(search) {
       });
       renderStore(game.id);
       
-      // Auto-switch to store tab on mobile after selecting a game
-      switchToStoreTabOnMobile();
+      // Auto-switch to stores tab on mobile
+      switchToTab('stores');
     });
 
     list.appendChild(card);
@@ -183,90 +183,69 @@ document.getElementById("searchInput").addEventListener("input", function () {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(function () {
     renderResults(value);
+    
+    // Auto-switch to games tab when searching on mobile
+    switchToTab('games');
   }, 250);
 });
 
-// Auto-switch to Games tab on mobile when search is focused
-document.getElementById("searchInput").addEventListener("focus", function () {
-  switchToGamesTabOnMobile();
-});
 
-function switchToGamesTabOnMobile() {
-  var tabBtns = document.querySelectorAll(".tab-btn");
-  var resultsBtn = document.querySelector('.tab-btn[data-tab="results"]');
-  var resultsPanel = document.getElementById("resultsPanel");
-  var storePanel = document.getElementById("storePanel");
+// ---------- Mobile Tabs ----------
+
+function switchToTab(tabName) {
+  var tabs = document.querySelectorAll('.tab-btn');
+  var gamesPanel = document.querySelector('.results-panel');
+  var storesPanel = document.querySelector('.store-panel');
   
   // Check if mobile tabs are visible
-  var mobileTabs = document.querySelector(".mobile-tabs");
-  if (!mobileTabs) return;
+  var mobileTabs = document.querySelector('.mobile-tabs');
+  if (!mobileTabs || window.getComputedStyle(mobileTabs).display === 'none') {
+    return; // Don't switch on desktop
+  }
   
-  var isVisible = window.getComputedStyle(mobileTabs).display !== "none";
-  if (!isVisible) return;
+  // Update tab states
+  tabs.forEach(function(t) {
+    if (t.dataset.tab === tabName) {
+      t.classList.add('active');
+    } else {
+      t.classList.remove('active');
+    }
+  });
   
-  // Switch to games/results tab
-  tabBtns.forEach(function (b) { b.classList.remove("active"); });
-  if (resultsBtn) resultsBtn.classList.add("active");
-  
-  resultsPanel.classList.add("active");
-  storePanel.classList.remove("active");
-}
-
-// ---------- Mobile Tab Switching ----------
-
-function switchToStoreTabOnMobile() {
-  // Only auto-switch on mobile (when tabs are visible)
-  var tabBtns = document.querySelectorAll(".tab-btn");
-  var storeBtn = document.querySelector('.tab-btn[data-tab="store"]');
-  var resultsPanel = document.getElementById("resultsPanel");
-  var storePanel = document.getElementById("storePanel");
-  
-  // Check if mobile tabs are visible (display: flex)
-  var mobileTabs = document.querySelector(".mobile-tabs");
-  if (!mobileTabs) return;
-  
-  var isVisible = window.getComputedStyle(mobileTabs).display !== "none";
-  if (!isVisible) return;
-  
-  // Switch to store tab
-  tabBtns.forEach(function (b) { b.classList.remove("active"); });
-  if (storeBtn) storeBtn.classList.add("active");
-  
-  resultsPanel.classList.remove("active");
-  storePanel.classList.add("active");
+  // Toggle panels
+  if (tabName === 'games') {
+    gamesPanel.classList.add('active');
+    storesPanel.classList.remove('active');
+  } else if (tabName === 'stores') {
+    gamesPanel.classList.remove('active');
+    storesPanel.classList.add('active');
+  }
 }
 
 function initMobileTabs() {
-  var tabBtns = document.querySelectorAll(".tab-btn");
-  var resultsPanel = document.getElementById("resultsPanel");
-  var storePanel = document.getElementById("storePanel");
-
-  if (!tabBtns.length || !resultsPanel || !storePanel) return;
-
-  // Set default active panel (results)
-  resultsPanel.classList.add("active");
-
-  tabBtns.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var targetTab = this.dataset.tab;
-
-      // Update button states
-      tabBtns.forEach(function (b) { b.classList.remove("active"); });
-      this.classList.add("active");
-
-      // Update panel visibility
-      if (targetTab === "results") {
-        resultsPanel.classList.add("active");
-        storePanel.classList.remove("active");
-      } else if (targetTab === "store") {
-        resultsPanel.classList.remove("active");
-        storePanel.classList.add("active");
-      }
+  var tabs = document.querySelectorAll('.tab-btn');
+  var gamesPanel = document.querySelector('.results-panel');
+  var storesPanel = document.querySelector('.store-panel');
+  
+  if (!tabs.length) return;
+  
+  // Set initial state - games panel active
+  gamesPanel.classList.add('active');
+  
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      switchToTab(this.dataset.tab);
     });
   });
 }
 
 // ---------- Init ----------
 
-renderResults("");
-initMobileTabs();
+document.addEventListener("DOMContentLoaded", function() {
+  // Wait a bit to ensure dbPriceCompare.js has loaded
+  setTimeout(function() {
+    console.log("Games loaded:", window.games ? window.games.length : 0);
+    renderResults("");
+    initMobileTabs();
+  }, 100);
+});
