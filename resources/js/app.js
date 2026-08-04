@@ -1,2 +1,1 @@
-import '../css/app.css';
-import './Mygames.js';
+﻿import '../css/app.css';
