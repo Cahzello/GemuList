@@ -1,31 +1,24 @@
-// ============================================================
-//  DATABASE  –  Game Price Compare
-//  Semua data game, toko, dan harga ada di sini.
-//  Nanti di Laravel, data ini akan diganti dengan data dari
-//  backend (API / Blade). Untuk sekarang pakai data statis.
-// ============================================================
-
 window.games = [
   {
     id: "witcher-1",
     title: "The Witcher",
     thumbnail: "https://picsum.photos/seed/witcher1/100/100",
     stores: [
-      { store: "G2A",        price: 345000, originalPrice: 375000, discountPercent: 8,    url: "https://www.g2a.com" },
-      { store: "Epic Games", price: 355810, originalPrice: null,   discountPercent: null, url: "https://www.epicgames.com" },
-      { store: "Steam",      price: 395410, originalPrice: null,   discountPercent: null, url: "https://store.steampowered.com" },
-      { store: "GOG",        price: 267670, originalPrice: null,   discountPercent: null, url: "https://www.gog.com" }
-    ]
+      { store: "G2A",        icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#e0472b"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>', price: 345000, originalPrice: 375000, url: "https://www.g2a.com" },
+      { store: "Epic Games", icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#313131"/><text x="6.5" y="16" font-size="8" fill="white" font-weight="bold">EG</text></svg>', price: 355810, originalPrice: null, url: "https://www.epicgames.com" },
+      { store: "Steam",      icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1b2838"/><circle cx="12" cy="12" r="4" fill="#c7d5e0"/><circle cx="12" cy="12" r="2" fill="#1b2838"/></svg>', price: 395410, originalPrice: null, url: "https://store.steampowered.com" },
+      { store: "GOG",        icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#86328a"/><text x="5" y="16" font-size="7" fill="white" font-weight="bold">GOG</text></svg>', price: 267670, originalPrice: null, url: "https://www.gog.com" }
+    ] 
   },
   {
     id: "witcher-2",
     title: "The Witcher 2",
     thumbnail: "https://picsum.photos/seed/witcher2/100/100",
     stores: [
-      { store: "G2A",        price: 289000, originalPrice: 340000, discountPercent: 15,   url: "https://www.g2a.com" },
-      { store: "Epic Games", price: 310500, originalPrice: null,   discountPercent: null, url: "https://www.epicgames.com" },
-      { store: "Steam",      price: 320000, originalPrice: null,   discountPercent: null, url: "https://store.steampowered.com" },
-      { store: "GOG",        price: 445000, originalPrice: null,   discountPercent: null, url: "https://www.gog.com" }
+      { store: "G2A",        icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#e0472b"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>', price: 289000, originalPrice: 340000, url: "https://www.g2a.com" },
+      { store: "Epic Games", icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#313131"/><text x="6.5" y="16" font-size="8" fill="white" font-weight="bold">EG</text></svg>', price: 310500, originalPrice: null, url: "https://www.epicgames.com" },
+      { store: "Steam",      icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1b2838"/><circle cx="12" cy="12" r="4" fill="#c7d5e0"/><circle cx="12" cy="12" r="2" fill="#1b2838"/></svg>', price: 320000, originalPrice: null, url: "https://store.steampowered.com" },
+      { store: "GOG",        icon: '<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#86328a"/><text x="5" y="16" font-size="7" fill="white" font-weight="bold">GOG</text></svg>', price: 445000, originalPrice: null, url: "https://www.gog.com" }
     ]
   },
   {
