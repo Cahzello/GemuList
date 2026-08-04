@@ -12,6 +12,14 @@ Route::get('/search', function () {
     return view('search.index');
 })->name('search.index');
 
+Route::get('/search', function () {
+    return view('search.index');
+})->name('games.search');
+
+Route::get('/search/detail', function () {
+    return view('search.detail-game');
+})->name('games.detail');
+
 Route::get('/my-games', function () {
     return view('myGames.index');
 })->name('myGames.index');
@@ -23,26 +31,6 @@ Route::get('/price-compare', function () {
 Route::get('/personal-score', function () {
     return view('personalScore.index');
 })->name('personalScore.index');
-
-Route::get('/navbar', function () {
-    return view('components.navbar');
-})->name('games.index');
-
-Route::get('/search', function () {
-    return view('search.index');
-})->name('games.search');
-
-Route::get('/search/detail', function () {
-    return view('search.detail-game');
-})->name('games.detail');
-
-Route::get('/footer', function () {
-    return view('components.footer');
-});
-
-Route::get('/test', function () {
-    return view('components.navbar');
-});
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -58,7 +46,3 @@ Route::post('/logout', function () {
 
     return redirect('/');
 })->middleware('auth')->name('logout');
-
-Route::get('/my-games-gl', function () {
-    return view('myGames.index');
-});
