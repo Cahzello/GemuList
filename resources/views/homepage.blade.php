@@ -9,8 +9,7 @@
 
     @vite([
         'resources/css/homepage/registrasi-gl.css',
-        'resources/css/homepage/global.css',
-        'resources/css/homepage/reset.css'
+        'resources/css/homepage/global.css'
     ])
 </head>
 
