@@ -46,4 +46,3 @@ Route::post('/logout', function () {
 
     return redirect('/');
 })->middleware('auth')->name('logout');
-
