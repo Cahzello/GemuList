@@ -16,7 +16,11 @@ Route::get('/price-compare', [PriceCompareController::class, 'index'])->name('pr
 
 Route::middleware('auth')->group(function () {
     Route::get('/my-games', [MyGamesController::class, 'index'])->name('myGames.index');
+    Route::patch('/my-games/{myGame}', [MyGamesController::class, 'update'])->name('myGames.update');
+    Route::delete('/my-games/{myGame}', [MyGamesController::class, 'destroy'])->name('myGames.destroy');
+
     Route::get('/personal-score', [PersonalScoreController::class, 'index'])->name('personalScore.index');
+    Route::post('/personal-score/{myGame}', [PersonalScoreController::class, 'update'])->name('personalScore.update');
 });
 
 require __DIR__.'/auth.php';

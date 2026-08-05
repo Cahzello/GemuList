@@ -80,7 +80,11 @@
 
     <x-footer />
 
-    @vite(['resources/js/dbPriceCompare.js', 'resources/js/priceCompare.js'])
+    <script>
+        window.games = @json($games);
+    </script>
+
+    @vite(['resources/js/priceCompare.js'])
 </body>
 
 </html>

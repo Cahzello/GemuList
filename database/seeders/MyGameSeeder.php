@@ -14,7 +14,7 @@ class MyGameSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', 'test@example.com')->first();
+        $user = User::where('email', 'budi@gmail.com')->first();
 
         if ($user === null) {
             return;
@@ -29,6 +29,16 @@ class MyGameSeeder extends Seeder
             ['title' => "Baldur's Gate 3", 'status' => 'planning', 'score' => 0, 'review' => '', 'added_date' => '2026-02-15'],
             ['title' => 'Starfield', 'status' => 'dropped', 'score' => 6, 'review' => 'Lots of space, less magic.', 'added_date' => '2025-12-05'],
             ['title' => 'Valorant', 'status' => 'progress', 'score' => 7, 'review' => 'Sharp gunplay, competitive and addictive.', 'added_date' => '2026-01-28'],
+            ['title' => 'The Last of Us Part I', 'status' => 'finished', 'score' => 9, 'review' => 'A heartbreaking story told with impeccable craft.', 'added_date' => '2025-06-14'],
+            ['title' => 'God of War Ragnarök', 'status' => 'finished', 'score' => 10, 'review' => 'A worthy sequel that raises the bar for cinematic action.', 'added_date' => '2025-05-02'],
+            ['title' => 'Resident Evil 4', 'status' => 'finished', 'score' => 8, 'review' => 'Survival horror at its most refined and tense.', 'added_date' => '2025-04-11'],
+            ['title' => 'Sekiro: Shadows Die Twice', 'status' => 'finished', 'score' => 9, 'review' => 'A razor-sharp test of patience and rhythm.', 'added_date' => '2025-03-09'],
+            ['title' => 'Hollow Knight', 'status' => 'dropped', 'score' => 7, 'review' => 'Gorgeous atmosphere, but the map drained my patience.', 'added_date' => '2025-02-19'],
+            ['title' => 'Celeste', 'status' => 'finished', 'score' => 8, 'review' => 'Tight platforming wrapped in a deeply human story.', 'added_date' => '2025-01-27'],
+            ['title' => 'Dark Souls III', 'status' => 'dropped', 'score' => 8, 'review' => 'Brilliant bosses, but I ran out of steam halfway.', 'added_date' => '2024-12-30'],
+            ['title' => 'Stardew Valley', 'status' => 'finished', 'score' => 8, 'review' => 'Cozy, charming and dangerously easy to sink hours into.', 'added_date' => '2024-11-18'],
+            ['title' => 'Grand Theft Auto V', 'status' => 'progress', 'score' => 8, 'review' => 'Still the best sandbox out there.', 'added_date' => '2026-01-05'],
+            ['title' => 'Detroit: Become Human', 'status' => 'planning', 'score' => 0, 'review' => '', 'added_date' => '2026-02-20'],
         ];
 
         foreach ($entries as $entry) {

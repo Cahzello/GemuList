@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('banner', 255);
             $table->string('logo', 255);
             $table->string('icon', 255);
+            $table->string('url', 255);
         });
     }
 

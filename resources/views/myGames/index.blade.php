@@ -83,7 +83,7 @@
                                                     x-transition:leave-end="opacity-0 -translate-y-2">
                                                     <template x-for="opt in statusOptions" :key="opt.value">
                                                         <button class="status-option"
-                                                            @click.stop="game.status = opt.value; game.dropdownOpen = false"
+                                                            @click.stop="setStatus(game, opt.value)"
                                                             x-text="opt.label"></button>
                                                     </template>
                                                 </div>
@@ -258,56 +258,7 @@
         <script>
             function myGames() {
                 return {
-                    games: [{
-                            id: 1,
-                            title: 'The Witcher 3: Wild Hunt',
-                            cover: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Witcher_3_cover_art.jpg/250px-Witcher_3_cover_art.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail',
-                            status: 'finished',
-                            dropdownOpen: false
-                        },
-                        {
-                            id: 2,
-                            title: 'Persona 5: Royal',
-                            cover: 'https://store-images.s-microsoft.com/image/apps.6937.14482474285447263.b2785fbb-9099-42c3-b705-629a79ac7e4a.1b3fdd25-f787-4146-8551-d00ad4d5be21',
-                            status: 'progress',
-                            dropdownOpen: false
-                        },
-                        {
-                            id: 3,
-                            title: 'Elden Ring',
-                            cover: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb1EHPzTI54_muBWIcz9hzr9SatK9jVBp2_wSbKoHHOtnhg8UAncbU5Ej8&s=10',
-                            status: 'planning',
-                            dropdownOpen: false
-                        },
-                        {
-                            id: 4,
-                            title: 'Cyberpunk 2077',
-                            cover: 'https://store-images.s-microsoft.com/image/apps.47379.63407868131364914.bcaa868c-407e-42c2-baeb-48a3c9f29b54.89bb995b-b066-4a53-9fe4-0260ce07e894',
-                            status: 'finished',
-                            dropdownOpen: false
-                        },
-                        {
-                            id: 5,
-                            title: 'Red Dead Redemption 2',
-                            cover: 'https://image.api.playstation.com/cdn/UP1004/CUSA03041_00/Hpl5MtwQgOVF9vJqlfui6SDB5Jl4oBSq.png',
-                            status: 'dropped',
-                            dropdownOpen: false
-                        },
-                        {
-                            id: 6,
-                            title: 'God of War',
-                            cover: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/God_of_War_4_cover.jpg/250px-God_of_War_4_cover.jpg',
-                            status: 'progress',
-                            dropdownOpen: false
-                        },
-                        {
-                            id: 7,
-                            title: "Baldur's Gate 3",
-                            cover: 'https://store-images.s-microsoft.com/image/apps.11593.13550459053619040.9c555c73-a698-4992-b0f3-c5084cf18b5e.82a9ea41-c628-4d02-8a0f-d0304eba31c7',
-                            status: 'planning',
-                            dropdownOpen: false
-                        }
-                    ],
+                    games: @json($games),
 
                     searchTerm: '',
                     currentSort: 'asc',
@@ -462,11 +413,43 @@
 
                     confirmDelete() {
                         if (!this.gameToDelete) return;
-                        this.games = this.games.filter(g => g.id !== this.gameToDelete.id);
-                        if (this.currentPage > this.totalPages) {
-                            this.currentPage = Math.max(1, this.totalPages);
-                        }
-                        this.closeDeleteModal();
+
+                        fetch(`/my-games/${this.gameToDelete.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                                'Accept': 'application/json'
+                            }
+                        }).then(response => {
+                            if (!response.ok) throw new Error('Gagal menghapus game');
+                            this.games = this.games.filter(g => g.id !== this.gameToDelete.id);
+                            if (this.currentPage > this.totalPages) {
+                                this.currentPage = Math.max(1, this.totalPages);
+                            }
+                            this.closeDeleteModal();
+                        }).catch(() => {
+                            this.closeDeleteModal();
+                        });
+                    },
+
+                    setStatus(game, status) {
+                        let previous = game.status;
+                        game.status = status;
+                        game.dropdownOpen = false;
+
+                        fetch(`/my-games/${game.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ status: status })
+                        }).then(response => {
+                            if (!response.ok) throw new Error('Gagal mengubah status');
+                        }).catch(() => {
+                            game.status = previous;
+                        });
                     }
                 };
             }

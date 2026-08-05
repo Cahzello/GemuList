@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -24,19 +25,21 @@ class GameController extends Controller
     {
         $keyword = trim((string) $request->query('q', ''));
 
-        $games = collect(config('games.list', []))
-            ->when($keyword !== '', function ($collection) use ($keyword) {
-                return $collection->filter(function ($game) use ($keyword) {
-                    return str_contains(strtolower($game['title']), strtolower($keyword));
-                });
+        $games = Game::query()
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                return $query->where('game_name', 'like', "%{$keyword}%");
             })
-            ->values();
+            ->orderBy('game_name')
+            ->get()
+            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
 
-        $trendingGames = collect(config('games.list', []))
-            ->filter(fn ($game) => in_array($game['title'], self::TRENDING_TITLES))
-            ->sortBy(fn ($game) => array_search($game['title'], self::TRENDING_TITLES))
+        $trendingGames = Game::query()
+            ->whereIn('game_name', self::TRENDING_TITLES)
+            ->get()
+            ->sortBy(fn (Game $game) => array_search($game->game_name, self::TRENDING_TITLES))
             ->values()
-            ->take(10);
+            ->take(10)
+            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
 
         return view('search.index', [
             'games' => $games,

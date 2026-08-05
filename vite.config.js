@@ -14,7 +14,6 @@ export default defineConfig({
                 'resources/css/footer/footer.css',
                 'resources/css/priceCompare.css',
                 'resources/js/app.js',
-                'resources/js/dbPriceCompare.js',
                 'resources/js/priceCompare.js'
             ],
             refresh: true,

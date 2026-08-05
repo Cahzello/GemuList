@@ -1,6 +1,9 @@
 @extends('index')
 
 @section('content')
+  <script>
+    window.personalScoreGames = @json($games);
+  </script>
   <div class="relative min-h-screen flex flex-col gap-7 pt-[clamp(88px,10vw,150px)] bg-[#141414] font-['Sora',_sans-serif] text-center overflow-x-hidden">
 
     <!-- Decorative glow shapes -->

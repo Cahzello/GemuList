@@ -142,8 +142,10 @@ function renderStore(gameId) {
   data.stores.forEach(function (store) {
     var isLowest = store.price === minPrice;
     
-    // Gunakan icon dari database, atau fallback ke getStoreIcon
-    var icon = store.icon || getStoreIcon(store.store);
+    // Gunakan icon dari database (URL), atau fallback ke getStoreIcon (SVG)
+    var icon = store.icon
+      ? '<img class="w-4 h-4 flex-shrink-0 rounded-full" src="' + store.icon + '" alt="' + store.store + '">'
+      : getStoreIcon(store.store);
     
     // Hitung diskon persentase secara otomatis dari originalPrice dan price
     var discountPercent = calculateDiscount(store.originalPrice, store.price);
@@ -242,7 +244,7 @@ function initMobileTabs() {
 // ---------- Init ----------
 
 document.addEventListener("DOMContentLoaded", function() {
-  // Wait a bit to ensure dbPriceCompare.js has loaded
+  // Wait a bit to ensure window.games has been set by the blade template
   setTimeout(function() {
     console.log("Games loaded:", window.games ? window.games.length : 0);
     renderResults("");
