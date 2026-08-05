@@ -16,6 +16,7 @@ Route::get('/price-compare', [PriceCompareController::class, 'index'])->name('pr
 
 Route::middleware('auth')->group(function () {
     Route::get('/my-games', [MyGamesController::class, 'index'])->name('myGames.index');
+    Route::post('/my-games', [MyGamesController::class, 'store'])->name('myGames.store');
     Route::patch('/my-games/{myGame}', [MyGamesController::class, 'update'])->name('myGames.update');
     Route::delete('/my-games/{myGame}', [MyGamesController::class, 'destroy'])->name('myGames.destroy');
 

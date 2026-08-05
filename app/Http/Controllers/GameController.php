@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\MyGame;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class GameController extends Controller
@@ -73,10 +75,18 @@ class GameController extends Controller
 
         $defaultDescription = "Navigate the digital sprawl of Neo-Saitama in this high-octane tactical RPG. As a rogue console cowboy, you'll need to optimize your hardware and manage your reputation among the warring megacorps. Every decision impacts your trajectory through the electrified underbelly of the city.";
 
+        $game = Game::where('game_name', $title)->first();
+
+        $inLibrary = $game !== null && Auth::check()
+            && MyGame::where('id_user', Auth::id())->where('id_game', $game->id_game)->exists();
+
         return view('search.detail-game', [
             'title' => $title,
             'image' => $image,
             'description' => $descriptions[$title] ?? $defaultDescription,
+            'gameId' => $game?->id_game,
+            'inLibrary' => $inLibrary,
+            'isAuthed' => Auth::check(),
         ]);
     }
 }

@@ -26,6 +26,36 @@ class MyGamesController extends Controller
         return view('myGames.index', ['games' => $games]);
     }
 
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_game' => ['required', 'integer', 'exists:games,id_game'],
+            'status' => ['required', 'in:planning,progress,finished,dropped'],
+        ]);
+
+        $exists = MyGame::where('id_user', Auth::id())
+            ->where('id_game', $validated['id_game'])
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Game already in your library.'], 409);
+        }
+
+        $myGame = MyGame::create([
+            'id_user' => Auth::id(),
+            'id_game' => $validated['id_game'],
+            'status' => $validated['status'],
+            'score' => 0,
+            'review' => '',
+            'added_date' => now()->toDateString(),
+        ]);
+
+        return response()->json([
+            'id' => $myGame->id_myGame,
+            'status' => $myGame->status,
+        ], 201);
+    }
+
     public function update(Request $request, MyGame $myGame): JsonResponse
     {
         $this->authorizeOwnership($myGame);

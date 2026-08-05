@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} - Detail Game</title>
 
     {{-- Google Fonts --}}
@@ -65,8 +66,8 @@
                 {{ $description }}
             </p>
             <div class="mt-6 lg:mt-auto flex">
-                <button type="button" id="gl10OpenBtn" class="inline-flex items-center justify-center px-7 py-3.5 min-w-[150px] min-h-[48px] bg-[#FF6B35] hover:bg-[#E55A27] active:translate-y-0 disabled:bg-[#FF6B35]/80 disabled:opacity-80 disabled:cursor-not-allowed border-0 rounded-lg font-['Sora',sans-serif] font-bold text-sm text-white cursor-pointer shadow-[0_10px_20px_-3px_rgba(255,107,53,0.4)] hover:shadow-[0_14px_25px_-3px_rgba(255,107,53,0.5)] hover:-translate-y-0.5 transition-all duration-200">
-                    Add to My Games
+                <button type="button" id="gl10OpenBtn" {{ $inLibrary ? 'disabled aria-disabled="true"' : '' }} class="inline-flex items-center justify-center px-7 py-3.5 min-w-[150px] min-h-[48px] bg-[#FF6B35] hover:bg-[#E55A27] active:translate-y-0 disabled:bg-[#FF6B35]/80 disabled:opacity-80 disabled:cursor-not-allowed border-0 rounded-lg font-['Sora',sans-serif] font-bold text-sm text-white cursor-pointer shadow-[0_10px_20px_-3px_rgba(255,107,53,0.4)] hover:shadow-[0_14px_25px_-3px_rgba(255,107,53,0.5)] hover:-translate-y-0.5 transition-all duration-200 {{ $inLibrary ? 'is-added' : '' }}">
+                    {{ $inLibrary ? 'Added' : 'Add to My Games' }}
                 </button>
             </div>
         </div>
@@ -104,7 +105,7 @@
 
                             <div class="absolute top-[calc(100%+6px)] inset-x-0 z-[1050] bg-[#1E1E1E] border border-[#FF6B35]/40 rounded-md shadow-2xl overflow-hidden opacity-0 invisible -translate-y-1.5 transition-all duration-200 [.is-open_&]:opacity-100 [.is-open_&]:visible [.is-open_&]:translate-y-0" role="listbox">
                                 <div class="gl10-select-option px-3.5 py-3 font-['Inter',sans-serif] text-sm text-[#D0D0D0] cursor-pointer hover:bg-[#FF6B35]/25 hover:text-white transition-colors [&.is-selected]:bg-[#FF6B35] [&.is-selected]:text-white [&.is-selected]:font-semibold is-selected" data-value="planning">Planning</div>
-                                <div class="gl10-select-option px-3.5 py-3 font-['Inter',sans-serif] text-sm text-[#D0D0D0] cursor-pointer hover:bg-[#FF6B35]/25 hover:text-white transition-colors [&.is-selected]:bg-[#FF6B35] [&.is-selected]:text-white [&.is-selected]:font-semibold" data-value="on_progress">On Progress</div>
+                                <div class="gl10-select-option px-3.5 py-3 font-['Inter',sans-serif] text-sm text-[#D0D0D0] cursor-pointer hover:bg-[#FF6B35]/25 hover:text-white transition-colors [&.is-selected]:bg-[#FF6B35] [&.is-selected]:text-white [&.is-selected]:font-semibold" data-value="progress">On Progress</div>
                                 <div class="gl10-select-option px-3.5 py-3 font-['Inter',sans-serif] text-sm text-[#D0D0D0] cursor-pointer hover:bg-[#FF6B35]/25 hover:text-white transition-colors [&.is-selected]:bg-[#FF6B35] [&.is-selected]:text-white [&.is-selected]:font-semibold" data-value="finished">Finished</div>
                                 <div class="gl10-select-option px-3.5 py-3 font-['Inter',sans-serif] text-sm text-[#D0D0D0] cursor-pointer hover:bg-[#FF6B35]/25 hover:text-white transition-colors [&.is-selected]:bg-[#FF6B35] [&.is-selected]:text-white [&.is-selected]:font-semibold" data-value="dropped">Dropped</div>
                             </div>
@@ -128,8 +129,8 @@
         const modalBackdrop = document.getElementById('gl10ModalBackdrop');
         const closeBtn = document.getElementById('gl10ModalCloseBtn');
         const saveBtn = document.getElementById('gl10ModalSaveBtn');
-        const gameTitle = @json($title);
-        const storageKey = 'gemulist_added_' + encodeURIComponent(gameTitle);
+        const gameId = @json($gameId);
+        const isAuthed = @json($isAuthed);
 
         function markAsAdded() {
             if (openBtn) {
@@ -140,13 +141,20 @@
             }
         }
 
-        // Cek status game dari localStorage saat halaman dibuka
-        if (localStorage.getItem(storageKey)) {
-            markAsAdded();
+        // Game tidak ditemukan di database -> matikan tombol
+        if (!gameId && openBtn) {
+            openBtn.disabled = true;
+            openBtn.classList.add('is-added');
+            openBtn.setAttribute('aria-disabled', 'true');
         }
 
         function openModal() {
             if (openBtn && (openBtn.disabled || openBtn.classList.contains('is-added'))) {
+                return;
+            }
+            // User belum login -> arahkan ke halaman login
+            if (!isAuthed) {
+                window.location.href = @json(route('login'));
                 return;
             }
             if (modalBackdrop) {
@@ -175,12 +183,27 @@
                 const hiddenInput = document.getElementById('gameStatusInput');
                 const selectedStatus = hiddenInput ? hiddenInput.value : 'planning';
 
-                // Simpan status game ke localStorage
-                localStorage.setItem(storageKey, selectedStatus);
-
-                // Ubah teks tombol menjadi Added & disabled
-                markAsAdded();
-                closeModal();
+                fetch(@json(route('myGames.store')), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id_game: gameId, status: selectedStatus })
+                }).then(response => {
+                    if (response.status === 401 || response.status === 403) {
+                        window.location.href = @json(route('login'));
+                        return;
+                    }
+                    if (!response.ok && response.status !== 409) {
+                        throw new Error('Failed to add game');
+                    }
+                    markAsAdded();
+                    closeModal();
+                }).catch(() => {
+                    closeModal();
+                });
             });
         }
 
