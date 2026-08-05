@@ -22,6 +22,7 @@ class StoreFactory extends Factory
             'banner' => fake()->imageUrl(1200, 300, 'banner'),
             'logo' => fake()->imageUrl(200, 200, 'logo'),
             'icon' => fake()->imageUrl(64, 64, 'icon'),
+            'url' => fake()->url(),
         ];
     }
 }

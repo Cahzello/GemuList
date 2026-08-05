@@ -3,32 +3,42 @@
 namespace Database\Seeders;
 
 use App\Models\Store;
+use App\Services\CheapSharkService;
 use Illuminate\Database\Seeder;
 
 class StoreSeeder extends Seeder
 {
+    private const STORES = [
+        ['id' => 1, 'name' => 'Steam'],
+        ['id' => 2, 'name' => 'GamersGate'],
+        ['id' => 3, 'name' => 'GreenManGaming'],
+        ['id' => 7, 'name' => 'GOG'],
+        ['id' => 11, 'name' => 'Humble Store'],
+        ['id' => 13, 'name' => 'Uplay'],
+        ['id' => 15, 'name' => 'Fanatical'],
+        ['id' => 21, 'name' => 'WinGameStore'],
+        ['id' => 23, 'name' => 'GameBillet'],
+        ['id' => 25, 'name' => 'Epic Games Store'],
+        ['id' => 27, 'name' => 'Gamesplanet'],
+        ['id' => 28, 'name' => 'Gamesload'],
+        ['id' => 30, 'name' => 'IndieGala'],
+        ['id' => 35, 'name' => 'DreamGame'],
+    ];
+
     /**
-     * Seed the stores used by the price comparison feature.
+     * Seed the active CheapShark stores.
      */
     public function run(): void
     {
-        $stores = [
-            ['store_name' => 'G2A', 'domain' => 'g2a.com', 'url' => 'https://www.g2a.com'],
-            ['store_name' => 'Epic Games', 'domain' => 'epicgames.com', 'url' => 'https://www.epicgames.com'],
-            ['store_name' => 'Steam', 'domain' => 'store.steampowered.com', 'url' => 'https://store.steampowered.com'],
-            ['store_name' => 'GOG', 'domain' => 'gog.com', 'url' => 'https://www.gog.com'],
-        ];
-
-        foreach ($stores as $store) {
-            $slug = strtolower(str_replace(' ', '-', $store['store_name']));
-
+        foreach (self::STORES as $store) {
             Store::updateOrCreate(
-                ['store_name' => $store['store_name']],
+                ['cheapshark_id' => $store['id']],
                 [
-                    'banner' => "https://picsum.photos/seed/{$slug}-banner/1200/300",
-                    'logo' => "https://picsum.photos/seed/{$slug}-logo/200/200",
-                    'icon' => "https://www.google.com/s2/favicons?domain={$store['domain']}&sz=64",
-                    'url' => $store['url'],
+                    'store_name' => $store['name'],
+                    'banner' => 'https://www.cheapshark.com/img/stores/banners/'.($store['id'] - 1).'.png',
+                    'logo' => 'https://www.cheapshark.com/img/stores/logos/'.($store['id'] - 1).'.png',
+                    'icon' => 'https://www.cheapshark.com/img/stores/icons/'.($store['id'] - 1).'.png',
+                    'url' => CheapSharkService::STORE_HOMEPAGES[$store['name']] ?? 'https://www.cheapshark.com',
                 ],
             );
         }

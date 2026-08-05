@@ -19,17 +19,15 @@ class DatabaseSeeder extends Seeder
             ['email' => 'budi@gmail.com'],
             ['username' => 'budi', 'password' => '12345678'],
         );
-        
+
         User::updateOrCreate(
             ['email' => 'test@example.com'],
             ['username' => 'testuser', 'password' => 'password'],
         );
 
-
         $this->call([
             GameSeeder::class,
             StoreSeeder::class,
-            GamePriceSeeder::class,
             MyGameSeeder::class,
         ]);
     }

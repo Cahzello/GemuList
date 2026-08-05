@@ -81,7 +81,7 @@
     <x-footer />
 
     <script>
-        window.games = @json($games);
+        window.priceCompareSearchUrl = @json(route('priceCompare.search'));
     </script>
 
     @vite(['resources/js/priceCompare.js'])

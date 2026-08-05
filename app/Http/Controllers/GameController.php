@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\MyGame;
+use App\Services\RawgService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -23,17 +25,18 @@ class GameController extends Controller
         'The Last of Us Part I',
     ];
 
+    public function __construct(private RawgService $rawg) {}
+
     public function search(Request $request): View
     {
         $keyword = trim((string) $request->query('q', ''));
 
-        $games = Game::query()
-            ->when($keyword !== '', function ($query) use ($keyword) {
-                return $query->where('game_name', 'like', "%{$keyword}%");
-            })
-            ->orderBy('game_name')
-            ->get()
-            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
+        $games = $this->localGames($keyword);
+
+        if ($keyword !== '' && $games->isEmpty()) {
+            $this->importFromRawg($keyword);
+            $games = $this->localGames($keyword);
+        }
 
         $trendingGames = Game::query()
             ->whereIn('game_name', self::TRENDING_TITLES)
@@ -48,6 +51,27 @@ class GameController extends Controller
             'keyword' => $keyword,
             'trendingGames' => $trendingGames,
         ]);
+    }
+
+    private function localGames(string $keyword): Collection
+    {
+        return Game::query()
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                return $query->where('game_name', 'like', "%{$keyword}%");
+            })
+            ->orderBy('game_name')
+            ->get()
+            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
+    }
+
+    private function importFromRawg(string $keyword): void
+    {
+        foreach ($this->rawg->search($keyword) as $game) {
+            Game::updateOrCreate(
+                ['game_name' => $game['title']],
+                ['thumbnail' => $game['image']],
+            );
+        }
     }
 
     public function show(Request $request): View

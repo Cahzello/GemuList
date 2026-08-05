@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'rawg' => [
+        'url' => env('RAWG_URL', 'https://api.rawg.io/api'),
+        'key' => env('RAWG_API_KEY'),
+    ],
+
+    'cheapshark' => [
+        'url' => env('CHEAPSHARK_URL', 'https://www.cheapshark.com/api/1.0'),
+    ],
+
+    'erapi' => [
+        'url' => env('ER_API_URL', 'https://open.er-api.com/v6/latest/USD'),
+        'fallback_rate' => env('IDR_FALLBACK_RATE', 16000),
+    ],
+
 ];

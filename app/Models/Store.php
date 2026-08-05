@@ -21,10 +21,12 @@ class Store extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'cheapshark_id',
         'store_name',
         'banner',
         'logo',
         'icon',
+        'url',
     ];
 
     /**

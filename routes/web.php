@@ -13,6 +13,7 @@ Route::get('/search', [GameController::class, 'search'])->name('games.search');
 Route::get('/search/detail', [GameController::class, 'show'])->name('games.detail');
 
 Route::get('/price-compare', [PriceCompareController::class, 'index'])->name('priceCompare.index');
+Route::get('/price-compare/search', [PriceCompareController::class, 'search'])->name('priceCompare.search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/my-games', [MyGamesController::class, 'index'])->name('myGames.index');
