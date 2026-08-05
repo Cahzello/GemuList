@@ -1,4 +1,3 @@
-import './game-search';
 import '../css/app.css';
 
 import Alpine from 'alpinejs';

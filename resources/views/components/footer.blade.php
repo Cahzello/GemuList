@@ -1,4 +1,4 @@
-﻿﻿@vite([
+@vite([
     "resources/css/footer/global.css",
     "resources/css/footer/footer.css",
     "resources/css/footer/reset.css",

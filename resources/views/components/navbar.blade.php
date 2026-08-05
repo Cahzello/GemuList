@@ -1,4 +1,4 @@
-﻿﻿@vite([
+@vite([
     "resources/css/navbar/global.css",
     "resources/css/navbar/navbar.css",
     "resources/css/navbar/reset.css",

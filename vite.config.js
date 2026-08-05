@@ -7,8 +7,18 @@ export default defineConfig({
         tailwindcss(),
         laravel({
             input: [
-                'resources/css/app.css', 
-                'resources/js/app.js', 
+                'resources/css/app.css',
+                'resources/css/navbar/global.css',
+                'resources/css/navbar/navbar.css',
+                'resources/css/navbar/reset.css',
+                'resources/css/footer/global.css',
+                'resources/css/footer/footer.css',
+                'resources/css/footer/reset.css',
+                'resources/css/homepage/registrasi-gl.css',
+                'resources/css/homepage/global.css',
+                'resources/css/homepage/reset.css',
+                'resources/css/priceCompare.css',
+                'resources/js/app.js',
                 'resources/js/personalScore.js',
                 'resources/js/dbPriceCompare.js',
                 'resources/js/priceCompare.js'

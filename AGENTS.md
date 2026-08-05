@@ -127,3 +127,15 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+<user-guidelines>
+
+## What to do
+- Follow user request
+
+## Warning
+- Before making any changes, please read all throughly all files assosiated with user request, not all.
+
+## After making changes
+- Always verify again is your changes is correct what user request it?
+/<user-guidelines>

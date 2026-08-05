@@ -10,13 +10,7 @@
     @vite([
         'resources/css/homepage/registrasi-gl.css',
         'resources/css/homepage/global.css',
-        'resources/css/homepage/reset.css',
-        'resources/css/navbar/global.css',
-        'resources/css/navbar/navbar.css',
-        'resources/css/navbar/reset.css',
-        'resources/css/footer/global.css',
-        'resources/css/footer/footer.css',
-        'resources/css/footer/reset.css'
+        'resources/css/homepage/reset.css'
     ])
 </head>
 
