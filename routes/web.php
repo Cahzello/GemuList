@@ -46,6 +46,4 @@ Route::post('/logout', function () {
 
     return redirect('/');
 })->middleware('auth')->name('logout');
-Route::get('/personalScore', function () {
-    return view('personalScore.index');
-});
+
