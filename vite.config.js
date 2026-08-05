@@ -8,7 +8,8 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css', 
-                'resources/js/app.js',
+                'resources/js/app.js', 
+                'resources/js/personalScore.js',
                 'resources/js/dbPriceCompare.js',
                 'resources/js/priceCompare.js'
             ],
