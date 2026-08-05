@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ request('title', 'GemuList') }} - Detail Game</title>
+    <title>{{ $title }} - Detail Game</title>
 
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,29 +19,9 @@
     <div class="fixed bottom-[15%] -right-[120px] w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(255,159,28,0.25)_0%,_rgba(255,159,28,0)_70%)] blur-[70px] rounded-full pointer-events-none z-0"></div>
 
 @php
-    $title = request('title', 'GemuList');
-    $image = request('image', null);
-
-    $descriptions = [
-        'Cyberpunk 2077' => "Navigate the digital sprawl of Night City in this open-world action-adventure RPG. Step into the shoes of V, a mercenary outlaw going after a one-of-a-kind implant that is the key to immortality.",
-        'Elden Ring' => "Rise, Tarnished, and be guided by grace to brandish the power of the Elden Ring and become an Elden Lord in the Lands Between.",
-        "Baldur's Gate 3" => "Gather your party and return to the Forgotten Realms in a tale of fellowship and betrayal, sacrifice and survival, and the lure of absolute power.",
-        'Valorant' => "Blend your style and experience on a global, competitive stage. You have 13 rounds to attack and defend your side using sharp gunplay and tactical abilities.",
-        'Starfield' => "In this next-generation role-playing game set amongst the stars, create any character you want and explore with unparalleled freedom as you embark on an epic journey to answer humanity's greatest mystery.",
-        'Red Dead Redemption 2' => "Arthur Morgan and the Van der Linde gang are outlaws on the run. With federal agents and the best bounty hunters in the nation massing on their heels, the gang must rob, steal and fight their way across America.",
-        'The Witcher 3' => "You are Geralt of Rivia, mercenary monster slayer. Before you stands a war-torn, monster-infested continent you can explore at will.",
-        'God of War Ragnarök' => "Embark on an epic and heartfelt journey as Kratos and Atreus struggle with holding on and letting go through the Nine Realms of Norse mythology.",
-        'Hogwarts Legacy' => "Experience Hogwarts in the 1800s. Your character is a student who holds the key to an ancient secret that threatens to tear the wizarding world apart.",
-        'Call of Duty: Modern Warfare' => "Drop into a visceral campaign or assemble your team in the ultimate online playground featuring multiple Ops challenges and battlegrounds.",
-        'Diablo IV' => "Endless demons to slaughter, countless abilities to master, nightmarish dungeons, and legendary loot in an expansive open world.",
-        'Final Fantasy XVI' => "An epic dark fantasy world where the fate of the land is decided by the mighty Eikons and the Dominants who wield them.",
-        'Resident Evil 4' => "Survival is just the beginning. Six years have passed since the biological disaster in Raccoon City, Leon S. Kennedy is sent on a mission to rescue the president's kidnapped daughter.",
-        'Street Fighter 6' => "Powered by Capcom's proprietary RE ENGINE, the Street Fighter 6 experience spans three distinct game modes featuring World Tour, Fighting Ground and Battle Hub.",
-        'Mortal Kombat 1' => "Discover a reborn Mortal Kombat Universe created by the Fire God Liu Kang featuring a new fighting system, game modes, and fatalities!",
-    ];
-
-    $defaultDescription = "Navigate the digital sprawl of Neo-Saitama in this high-octane tactical RPG. As a rogue console cowboy, you'll need to optimize your hardware and manage your reputation among the warring megacorps. Every decision impacts your trajectory through the electrified underbelly of the city.";
-    $description = $descriptions[$title] ?? $defaultDescription;
+    $title = $title ?? 'GemuList';
+    $image = $image ?? null;
+    $description = $description ?? "Navigate the digital sprawl of Neo-Saitama in this high-octane tactical RPG. As a rogue console cowboy, you'll need to optimize your hardware and manage your reputation among the warring megacorps. Every decision impacts your trajectory through the electrified underbelly of the city.";
 @endphp
 
 <section class="min-h-screen bg-transparent text-[#F4F4F4] px-5 lg:px-20 py-[40px] flex flex-col justify-center relative z-10 overflow-x-hidden">

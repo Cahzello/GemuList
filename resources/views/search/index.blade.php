@@ -13,7 +13,7 @@
         </div>
 
         <div class="relative z-10">
-            @if (trim(request('q', '')) === '')
+            @if ($keyword === '')
                 @include('search.game-search')
             @else
                 @include('search.search-results')

@@ -73,25 +73,7 @@
             </button>
 
             @php
-                $allGames = config('games.list', []);
-                $aaaTitles = [
-                    'Cyberpunk 2077',
-                    'Elden Ring',
-                    "Baldur's Gate 3",
-                    'Red Dead Redemption 2',
-                    'Grand Theft Auto V',
-                    'The Witcher 3: Wild Hunt',
-                    'God of War Ragnarök',
-                    'Resident Evil 4',
-                    'Starfield',
-                    'The Last of Us Part I',
-                ];
-
-                $games = collect($allGames)
-                    ->filter(fn($game) => in_array($game['title'], $aaaTitles))
-                    ->sortBy(fn($game) => array_search($game['title'], $aaaTitles))
-                    ->values()
-                    ->take(10);
+                $games = $trendingGames;
             @endphp
 
             <div id="glCarouselViewport" class="w-full overflow-hidden py-2">

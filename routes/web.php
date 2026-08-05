@@ -1,48 +1,25 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MyGamesController;
+use App\Http\Controllers\PersonalScoreController;
+use App\Http\Controllers\PriceCompareController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('search.index');
-})->name('search.index');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/search', function () {
-    return view('search.index');
-})->name('search.index');
+Route::get('/search', [GameController::class, 'search'])->name('games.search');
+Route::get('/search/detail', [GameController::class, 'show'])->name('games.detail');
 
-Route::get('/search', function () {
-    return view('search.index');
-})->name('games.search');
+Route::get('/my-games', [MyGamesController::class, 'index'])->name('myGames.index');
+Route::get('/price-compare', [PriceCompareController::class, 'index'])->name('priceCompare.index');
+Route::get('/personal-score', [PersonalScoreController::class, 'index'])->name('personalScore.index');
 
-Route::get('/search/detail', function () {
-    return view('search.detail-game');
-})->name('games.detail');
-
-Route::get('/my-games', function () {
-    return view('myGames.index');
-})->name('myGames.index');
-
-Route::get('/price-compare', function () {
-    return view('priceCompare.index');
-})->name('priceCompare.index');
-
-Route::get('/personal-score', function () {
-    return view('personalScore.index');
-})->name('personalScore.index');
-
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect('/');
-})->middleware('auth')->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');

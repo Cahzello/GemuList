@@ -5,16 +5,8 @@
 --}}
 
 @php
-    $allGames = config('games.list', []);
-    $keyword = trim(request('q', ''));
-
-    $games = collect($allGames)
-        ->when($keyword !== '', function ($collection) use ($keyword) {
-            return $collection->filter(function ($game) use ($keyword) {
-                return str_contains(strtolower($game['title']), strtolower($keyword));
-            });
-        })
-        ->values();
+    $games = $games ?? collect();
+    $keyword = $keyword ?? '';
 @endphp
 
 <section class="relative z-10 w-full max-w-[1280px] mx-auto px-6 pt-[95px] pb-[80px] box-border">

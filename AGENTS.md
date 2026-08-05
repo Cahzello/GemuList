@@ -136,6 +136,9 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ## Warning
 - Before making any changes, please read all throughly all files assosiated with user request, not all.
 
+## Laravel convention
+- Whenever Laravel provides a feature (e.g. `php artisan make:controller`, `make:test`, `make:model`), use the artisan command instead of writing the file from scratch. Only write the file manually when no artisan command exists.
+
 ## After making changes
 - Always verify again is your changes is correct what user request it?
 /<user-guidelines>

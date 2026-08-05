@@ -10,7 +10,7 @@
         </div>
 
         <div class="navbar-links">
-            <a href="{{ Route::has('search.index') ? route('search.index') : '#' }}" class="nav-link {{ request()->routeIs('search.*') ? 'active' : '' }}">Search Games</a>
+            <a href="{{ Route::has('games.search') ? route('games.search') : '#' }}" class="nav-link {{ request()->routeIs('games.*') ? 'active' : '' }}">Search Games</a>
             <a href="{{ Route::has('myGames.index') ? route('myGames.index') : '#' }}" class="nav-link {{ request()->routeIs('myGames.*') ? 'active' : '' }}">My Games</a>
             <a href="{{ Route::has('priceCompare.index') ? route('priceCompare.index') : '#' }}" class="nav-link {{ request()->routeIs('priceCompare.*') ? 'active' : '' }}">Price Compare</a>
             <a href="{{ Route::has('personalScore.index') ? route('personalScore.index') : '#' }}" class="nav-link {{ request()->routeIs('personalScore.*') ? 'active' : '' }}">Personal Score</a>
@@ -42,7 +42,7 @@
     </div>
 
     <div class="mobile-menu" id="mobileMenu">
-        <a href="{{ Route::has('search.index') ? route('search.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('search.*') ? 'active' : '' }}">Search Games</a>
+        <a href="{{ Route::has('games.search') ? route('games.search') : '#' }}" class="mobile-nav-link {{ request()->routeIs('games.*') ? 'active' : '' }}">Search Games</a>
         <a href="{{ Route::has('myGames.index') ? route('myGames.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('myGames.*') ? 'active' : '' }}">My Games</a>
         <a href="{{ Route::has('priceCompare.index') ? route('priceCompare.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('priceCompare.*') ? 'active' : '' }}">Price Compare</a>
         <a href="{{ Route::has('personalScore.index') ? route('personalScore.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('personalScore.*') ? 'active' : '' }}">Personal Score</a>

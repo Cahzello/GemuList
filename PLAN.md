@@ -1,49 +1,56 @@
-# UI Fix Plan — GemuList `resources/`
+# Plan: Refactor `routes/web.php` + Kandidat Controller
 
-Errors found by examining all files under `resources/` that break the UI. Working space: `resources/`, plus the approved `vite.config.js` fix.
+## Masalah saat ini
 
-## 1. Duplicate navbar on Search page — HIGH
-`resources/views/search/index.blade.php:7`
-- Layout `index.blade.php:15` already renders `<x-navbar />`; the search page's `@section('content')` renders it a second time.
-- Result: two navbars, duplicate IDs (`mobileMenuBtn`, `mobileMenu`, `userDropdownToggle`, `userDropdown`) → mobile hamburger & user dropdown break (JS binds to first copy, user clicks second).
-- **Fix:** delete `<x-navbar />` on line 7.
+1. Nama route ganda `search.index` di `/` dan `/search` — nama kedua menimpa yang pertama.
+2. Path `/search` didaftarkan dua kali dengan nama berbeda (`search.index` & `games.search`) — rawan konflik.
+3. Semua halaman memakai Closure di `web.php`; logika bisnis (filter `?q=`, trending 10 game, map deskripsi) ada di blok `@php` dalam blade.
+4. Login tidak punya handler POST — form `login.blade.php` POST ke route GET `login` (akan 405).
+5. Bug redirect: `RegisterController` mengarah ke `route('dashboard')` yang tidak ada.
+6. Logout pakai Closure (`Auth::logout()` + invalidate session) — pindah ke controller.
 
-## 2. Malformed closing tag `</d>` — HIGH
-`resources/views/search/index.blade.php:24`
-- Line 24 is `</d>` instead of `</div>`; the wrapper `<div>` opened on line 5 is never closed.
-- **Fix:** change `</d>` → `</div>`.
+## Route target
 
-## 3. `@vite` references missing from build input — RESOLVED
-- All CSS entries are now present in `vite.config.js` `input` (navbar/footer/homepage/priceCompare), and `npm run build` emits a complete manifest.
-- Note: the redundant `reset.css` entries were since removed from both `vite.config.js` and the blade `@vite` lists (see item 8).
+| Method | URI | Aksi | Nama |
+|---|---|---|---|
+| GET | `/` | `HomeController@index` (render `homepage.blade.php`) | `home` |
+| GET | `/search` | `GameController@search` (filter `?q=`) | `games.search` |
+| GET | `/search/detail` | `GameController@show` (detail + deskripsi) | `games.detail` |
+| GET | `/my-games` | `MyGamesController@index` | `myGames.index` |
+| GET | `/price-compare` | `PriceCompareController@index` | `priceCompare.index` |
+| GET | `/personal-score` | `PersonalScoreController@index` | `personalScore.index` |
+| GET | `/login` | `Auth\LoginController@showLoginForm` | `login` |
+| GET/POST | `/register` | `Auth\RegisterController` | `register` |
+| POST | `/logout` | `Auth\LoginController@logout` | `logout` |
 
-## 4. UTF-8 BOM at start of components — LOW
-`resources/views/components/navbar.blade.php:1`, `components/footer.blade.php:1`
-- Files begin with a zero-width BOM rendered before `<nav>`/`<footer>`.
-- **Fix:** strip the BOM from both files.
+## Kandidat Controller (dibuat via `php artisan make:controller`)
 
-## 5. Homepage stylesheet loading — VERIFIED, no duplicate
-`resources/views/homepage.blade.php:10-14`
-- Homepage `@vite`s only its own CSS (`registrasi-gl.css`, `global.css`); navbar/footer CSS comes from the included components. No duplication.
-- `homepage/reset.css` removed from the `@vite` list (see item 8).
+- `HomeController` — `index()` → `view('homepage')`.
+- `GameController` — `search()` (filter `config('games.list')` oleh `?q=` + trending games), `show()` (detail game + deskripsi).
+- `MyGamesController` — `index()` → `view('myGames.index')`.
+- `PriceCompareController` — `index()` → `view('priceCompare.index')`.
+- `PersonalScoreController` — `index()` → `view('personalScore.index')`.
+- `Auth\LoginController` — `showLoginForm()` → `view('auth.login')`, `logout()` (pindahan dari Closure lama).
 
-## 6. Dead carousel JS — LOW
-`resources/js/app.js:1` imports `./game-search`, which targets selectors (`.gl06__trending`, `.carousel-card`, `.gl06__nav-btn--*`) that no longer exist; the carousel is driven by the inline script in `game-search.blade.php`.
-- **Fix:** remove `import './game-search';` from `app.js`.
+## Perubahan lain
 
-## 7. Missing theme token breaks auth input borders — LOW
-`resources/css/app.css` `@theme` defines `--color-input` but not `--color-input-border`, so `border-input-border` (used in `auth/login.blade.php` & `auth/register.blade.php`) generates nothing.
-- **Fix:** add `--color-input-border` (e.g. `#2A2A2A`) to the theme.
+- `Auth\RegisterController` — redirect `route('dashboard')` → `route('home')`.
+- `components/navbar.blade.php` — `search.index` → `games.search`, `routeIs('search.*')` → `routeIs('games.*')`.
+- View search (`search/index`, `search/game-search`, `search/search-results`, `search/detail-game`) — terima data dari controller, hapus blok `@php` logika.
 
-## 8. Unlayered `reset.css` overrides Tailwind utility colors on buttons — RESOLVED
-- `resources/css/navbar/reset.css`, `footer/reset.css`, `homepage/reset.css` were Tailwind preflight duplicates shipped as **unlayered** CSS loaded via `@vite` **after** `app.css`. Unlayered rules beat Tailwind v4's `@layer utilities`, so any button/input using utility classes lost its background, border, and text color (e.g. personalScore pagination, sort-bar buttons, myGames apply/sort/status/delete buttons).
-- **Fix applied:** removed `reset.css` from `navbar.blade.php`, `footer.blade.php`, `homepage.blade.php` `@vite` lists and from `vite.config.js` input; deleted the three files. Tailwind v4 preflight (via `app.css`, `@layer base`) provides identical resets.
+## Konvensi
 
-## Verification
-1. Run `npm run build`; confirm `public/build/manifest.json` lists all entries.
-2. Load `/`, `/search`, `/my-games`, `/price-compare`, `/personal-score`, `/login` — no duplicate navbar, no ViteException.
-3. Run `vendor/bin/pint --dirty` per repo rules.
+- Semua pembuatan file yang punya fitur Laravel memakai `php artisan` (mis. `make:controller`), tidak menulis file dari awal.
+- Tidak ada model/resource baru yang di-generate → controller dibuat tanpa `-m`/`-r`.
 
-## Left as-is (noted, no change)
-- `resources/css/detailgame.css`, `game-search.css`, `search-results.css` are orphaned/unreferenced — harmless.
-- `personalScore/index.blade.php` lacks navbar/footer — consistency issue; add on request.
+## Out of scope (dicatat)
+
+- POST `/login` belum punya handler — perlu `AuthController@login` (`Auth::attempt` + remember) tersendiri nanti.
+
+## Verifikasi
+
+1. `php artisan route:list` — nama route bersih & unik.
+2. `npm run build` — manifest build sukses.
+3. Cek semua halaman (/, /search?q=, /my-games, /price-compare, /personal-score, /login, /register) status 200.
+4. `php artisan test --compact` — test lolos.
+5. `vendor/bin/pint --format agent` — sesuai gaya repo.
