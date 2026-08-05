@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user', function (Blueprint $table) {
-            $table->unsignedInteger('id_user')->autoIncrement();
-            $table->string('username', 20);
-            $table->string('email', 255);
-            $table->string('password', 255);
-            $table->rememberToken();
+        Schema::create('games', function (Blueprint $table) {
+            $table->unsignedInteger('id_game')->autoIncrement();
+            $table->string('game_name', 255);
+            $table->string('thumbnail', 255);
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('games');
     }
 };

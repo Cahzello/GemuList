@@ -20,7 +20,7 @@
             @auth
                 <div class="user-welcome" id="userDropdownToggle">
                     <p class="text2">Welcome back,</p>
-                    <p class="text3">Hi, {{ Auth::user()->name }}!</p>
+                    <p class="text3">Hi, {{ Auth::user()->username }}!</p>
                 </div>
                 <div class="user-dropdown" id="userDropdown">
                     <form method="POST" action="{{ route('logout') }}">
@@ -51,7 +51,7 @@
         <a href="{{ Route::has('priceCompare.index') ? route('priceCompare.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('priceCompare.*') ? 'active' : '' }}">Price Compare</a>
         <a href="{{ Route::has('personalScore.index') ? route('personalScore.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('personalScore.*') ? 'active' : '' }}">Personal Score</a>
         @auth
-            <div class="mobile-nav-link">{{ Auth::user()->name }}</div>
+            <div class="mobile-nav-link">{{ Auth::user()->username }}</div>
             <form method="POST" action="{{ route('logout') }}" class="m-0">
                 @csrf
                 <button type="submit" class="mobile-nav-link w-full text-left m-0 cursor-pointer">Logout</button>

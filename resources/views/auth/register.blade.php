@@ -17,26 +17,26 @@
 
                 <!-- Form Fields -->
                 <div class="flex flex-col gap-3 sm:gap-4">
-                    <!-- Name Field -->
+                    <!-- Username Field -->
                     <div class="flex flex-col gap-2">
-                        <label for="name" class="text-xs sm:text-sm font-mono font-medium uppercase tracking-wider text-surface">Name</label>
+                        <label for="username" class="text-xs sm:text-sm font-mono font-medium uppercase tracking-wider text-surface">Username</label>
 
-                        <div class="flex items-center gap-4 bg-input border border-input-border rounded px-4 py-3 focus-within:border-secondary focus-within:ring-1 focus-within:ring-secondary transition-colors @error('name') border-red-500 @enderror">
+                        <div class="flex items-center gap-4 bg-input border border-input-border rounded px-4 py-3 focus-within:border-secondary focus-within:ring-1 focus-within:ring-secondary transition-colors @error('username') border-red-500 @enderror">
                             <img src="{{ asset('assets/card-over-icon.png') }}" alt="User icon" class="w-4 h-4 flex-shrink-0 opacity-70">
                             <input
                                 type="text"
-                                id="name"
-                                name="name"
-                                value="{{ old('name') }}"
-                                placeholder="Enter your name"
+                                id="username"
+                                name="username"
+                                value="{{ old('username') }}"
+                                placeholder="Enter your username"
                                 class="flex-1 min-w-0 bg-transparent border-none outline-none text-white text-base font-inter placeholder-muted"
                                 required
-                                autocomplete="name"
+                                autocomplete="username"
                                 autofocus
                             >
                         </div>
 
-                        @error('name')
+                        @error('username')
                             <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
