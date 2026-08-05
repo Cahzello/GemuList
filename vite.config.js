@@ -19,7 +19,6 @@ export default defineConfig({
                 'resources/css/homepage/reset.css',
                 'resources/css/priceCompare.css',
                 'resources/js/app.js',
-                'resources/js/personalScore.js',
                 'resources/js/dbPriceCompare.js',
                 'resources/js/priceCompare.js'
             ],

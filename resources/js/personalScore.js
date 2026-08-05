@@ -1274,4 +1274,5 @@ const App = {
 
 document.addEventListener("DOMContentLoaded", () => App.init());
 
+export default App;
 
