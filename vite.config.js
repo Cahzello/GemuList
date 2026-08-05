@@ -12,11 +12,8 @@ export default defineConfig({
                 'resources/css/navbar/navbar.css',
                 'resources/css/footer/global.css',
                 'resources/css/footer/footer.css',
-                'resources/css/homepage/registrasi-gl.css',
-                'resources/css/homepage/global.css',
                 'resources/css/priceCompare.css',
                 'resources/js/app.js',
-                'resources/js/dbPriceCompare.js',
                 'resources/js/priceCompare.js'
             ],
             refresh: true,

@@ -15,11 +15,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::updateOrCreate(
+            ['email' => 'budi@gmail.com'],
+            ['username' => 'budi', 'password' => '12345678'],
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            ['username' => 'testuser', 'password' => 'password'],
+        );
+
+        $this->call([
+            GameSeeder::class,
+            StoreSeeder::class,
+            MyGameSeeder::class,
         ]);
     }
 }

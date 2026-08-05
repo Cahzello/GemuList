@@ -1,49 +1,57 @@
-# UI Fix Plan — GemuList `resources/`
+# Plan: Integrasi API RAWG (Game) + CheapShark (Harga)
 
-Errors found by examining all files under `resources/` that break the UI. Working space: `resources/`, plus the approved `vite.config.js` fix.
+## Scope
 
-## 1. Duplicate navbar on Search page — HIGH
-`resources/views/search/index.blade.php:7`
-- Layout `index.blade.php:15` already renders `<x-navbar />`; the search page's `@section('content')` renders it a second time.
-- Result: two navbars, duplicate IDs (`mobileMenuBtn`, `mobileMenu`, `userDropdownToggle`, `userDropdown`) → mobile hamburger & user dropdown break (JS binds to first copy, user clicks second).
-- **Fix:** delete `<x-navbar />` on line 7.
+- **Search game** (`GET /search`): pencarian lokal (tabel `games`) tetap prioritas. Jika hasil kosong → fetch **RAWG API** → simpan hasil ke tabel `games` (cache lokal) → query ulang.
+- **Price Compare** (`/price-compare`): data harga per store dari **CheapShark API** → simpan ke `game_prices`. Saat game dicari tapi tidak ada harga di DB → fetch CheapShark → simpan.
+- **Konversi mata uang:** harga CheapShark dalam USD dikonversi ke Rupiah via `https://open.er-api.com/v6/latest/USD` (rate di-cache 6 jam; fallback `IDR_FALLBACK_RATE=16000`).
+- **Store:** memakai daftar **store aktif CheapShark** (Steam, GOG, Epic Games Store, Humble, Fanatical, dst). G2A dihapus karena tidak ada di CheapShark.
+- **Seeder harga acak (`GamePriceSeeder`) dihapus** — harga murni dari CheapShark.
+- RAWG memerlukan API key (`RAWG_API_KEY`); jika kosong, fetch RAWG dilewati (tampil "tidak ditemukan").
+- Halaman `/search`, `/search/detail`, `/price-compare` tetap publik.
 
-## 2. Malformed closing tag `</d>` — HIGH
-`resources/views/search/index.blade.php:24`
-- Line 24 is `</d>` instead of `</div>`; the wrapper `<div>` opened on line 5 is never closed.
-- **Fix:** change `</d>` → `</div>`.
+## Langkah
 
-## 3. `@vite` references missing from build input — RESOLVED
-- All CSS entries are now present in `vite.config.js` `input` (navbar/footer/homepage/priceCompare), and `npm run build` emits a complete manifest.
-- Note: the redundant `reset.css` entries were since removed from both `vite.config.js` and the blade `@vite` lists (see item 8).
+1. **Konfigurasi**
+   - `.env` & `.env.example`: `RAWG_API_KEY=`, `CHEAPSHARK_URL=https://www.cheapshark.com/api/1.0`, `ER_API_URL=https://open.er-api.com/v6/latest/USD`, `IDR_FALLBACK_RATE=16000`.
+   - `config/services.php`: blok `rawg`, `cheapshark`, `erapi`.
 
-## 4. UTF-8 BOM at start of components — LOW
-`resources/views/components/navbar.blade.php:1`, `components/footer.blade.php:1`
-- Files begin with a zero-width BOM rendered before `<nav>`/`<footer>`.
-- **Fix:** strip the BOM from both files.
+2. **Service (`app/Services/`)**
+   - `ExchangeRateService` — `idr(): float`; fetch ER API → `rates.IDR`, cache 6 jam; gagal → fallback.
+   - `RawgService` — `search(string $q, int $pageSize = 12): array`; `GET /games?key=&search=&page_size=`; mapping `title=name`, `image=background_image`; gagal/401 → `[]`.
+   - `CheapSharkService` —
+     - `syncStores(): void` — upsert 14 store aktif CheapShark (dengan `cheapshark_id`, homepage URL, icon).
+     - `pricesFor(string $title): void` — `GET /games?title=` (buat game bila belum ada dari `external`+`thumb`) → `GET /deals?title=<external>` → `GamePrice::updateOrCreate` tiap store (harga = USD × `ExchangeRateService::idr()`).
 
-## 5. Homepage stylesheet loading — VERIFIED, no duplicate
-`resources/views/homepage.blade.php:10-14`
-- Homepage `@vite`s only its own CSS (`registrasi-gl.css`, `global.css`); navbar/footer CSS comes from the included components. No duplication.
-- `homepage/reset.css` removed from the `@vite` list (see item 8).
+3. **Migration**
+   - `add_cheapshark_id_to_stores`: kolom `cheapshark_id` (nullable, unique) pada `stores`.
 
-## 6. Dead carousel JS — LOW
-`resources/js/app.js:1` imports `./game-search`, which targets selectors (`.gl06__trending`, `.carousel-card`, `.gl06__nav-btn--*`) that no longer exist; the carousel is driven by the inline script in `game-search.blade.php`.
-- **Fix:** remove `import './game-search';` from `app.js`.
+4. **Seeder**
+   - `StoreSeeder` ditulis ulang → 14 store aktif CheapShark.
+   - `GamePriceSeeder` dihapus + panggilannya dihapus dari `DatabaseSeeder`.
 
-## 7. Missing theme token breaks auth input borders — LOW
-`resources/css/app.css` `@theme` defines `--color-input` but not `--color-input-border`, so `border-input-border` (used in `auth/login.blade.php` & `auth/register.blade.php`) generates nothing.
-- **Fix:** add `--color-input-border` (e.g. `#2A2A2A`) to the theme.
+5. **Search (RAWG)**
+   - `GameController@search`: query lokal dulu; jika `keyword != ''`, hasil kosong, dan key RAWG terisi → `RawgService::search` → `Game::updateOrCreate(['game_name'], ['thumbnail'])` → query ulang.
+   - Teks kosong di `search-results.blade.php` disesuaikan (sudah dicoba ke DB & RAWG).
 
-## 8. Unlayered `reset.css` overrides Tailwind utility colors on buttons — RESOLVED
-- `resources/css/navbar/reset.css`, `footer/reset.css`, `homepage/reset.css` were Tailwind preflight duplicates shipped as **unlayered** CSS loaded via `@vite` **after** `app.css`. Unlayered rules beat Tailwind v4's `@layer utilities`, so any button/input using utility classes lost its background, border, and text color (e.g. personalScore pagination, sort-bar buttons, myGames apply/sort/status/delete buttons).
-- **Fix applied:** removed `reset.css` from `navbar.blade.php`, `footer.blade.php`, `homepage.blade.php` `@vite` lists and from `vite.config.js` input; deleted the three files. Tailwind v4 preflight (via `app.css`, `@layer base`) provides identical resets.
+6. **Price Compare (CheapShark)**
+   - Route baru `GET /price-compare/search` (publik) → JSON.
+   - Logika: cari game lokal berharga via LIKE; jika kosong → `CheapSharkService::pricesFor(q)` → query ulang; struktur respons sama seperti sekarang (`id, title, thumbnail, stores[]`).
+   - `priceCompare.js`: filter client-side (`window.games`) diganti fetch debounce ke endpoint; render & mobile tabs tetap.
 
-## Verification
-1. Run `npm run build`; confirm `public/build/manifest.json` lists all entries.
-2. Load `/`, `/search`, `/my-games`, `/price-compare`, `/personal-score`, `/login` — no duplicate navbar, no ViteException.
-3. Run `vendor/bin/pint --dirty` per repo rules.
+7. **Testing (Pest)**
+   - Unit: `ExchangeRateServiceTest`, `RawgServiceTest`, `CheapSharkServiceTest` — pakai `Http::fake()`.
+   - Feature: search kosong → fetch RAWG & game tersimpan; `/price-compare/search` tanpa harga → fetch CheapShark & tersimpan.
+   - Cek test lama yang merujuk `GamePriceSeeder` dan sesuaikan.
 
-## Left as-is (noted, no change)
-- `resources/css/detailgame.css`, `game-search.css`, `search-results.css` are orphaned/unreferenced — harmless.
-- `personalScore/index.blade.php` lacks navbar/footer — consistency issue; add on request.
+8. **Verifikasi**
+   - `php artisan test --compact` hijau.
+   - `vendor/bin/pint --format agent`.
+   - `npm run build` (karena `priceCompare.js` diubah).
+   - `php artisan migrate:fresh --seed` (store baru aktif, tanpa harga palsu).
+
+## Catatan
+
+- `GameFactory` & `GamePriceFactory` tetap dipakai test, tidak dihapus.
+- Struktur kolom `games` tidak berubah (dedup berbasis `game_name`).
+- CheapShark: harga per store lewat endpoint `/deals`; store aktif yang dipakai: Steam(1), GamersGate(2), GreenManGaming(3), GOG(7), Humble Store(11), Uplay(13), Fanatical(15), WinGameStore(21), GameBillet(23), Epic Games Store(25), Gamesplanet(27), Gamesload(28), IndieGala(30), DreamGame(35).
