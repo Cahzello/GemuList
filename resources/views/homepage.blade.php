@@ -1,49 +1,33 @@
-﻿<!DOCTYPE html>
-<html lang="id">
+﻿@extends('index')
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>GemuList - Your Gaming Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+@section('content')
+    <div class="m-0 p-0 bg-[#141414] text-[#F4F4F4] min-h-screen relative overflow-x-hidden selection:bg-[#FF6B35] selection:text-white bg-[radial-gradient(circle_at_5%_35%,_rgba(255,107,53,0.22)_0%,_rgba(255,107,53,0)_45%),_radial-gradient(circle_at_95%_65%,_rgba(255,159,28,0.20)_0%,_rgba(255,159,28,0)_45%),_linear-gradient(180deg,_#141414_0%,_#1A1A1A_100%)] bg-fixed">
+        {{-- Ambient Orange Glow Orbs --}}
+        <div class="fixed top-[15%] -left-[120px] w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(255,107,53,0.3)_0%,_rgba(255,107,53,0)_70%)] blur-[70px] rounded-full pointer-events-none z-0"></div>
+        <div class="fixed bottom-[15%] -right-[120px] w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(255,159,28,0.25)_0%,_rgba(255,159,28,0)_70%)] blur-[70px] rounded-full pointer-events-none z-0"></div>
 
-    @vite([
-        'resources/css/homepage/registrasi-gl.css',
-        'resources/css/homepage/global.css'
-    ])
-</head>
+        <div class="relative z-10 flex flex-col items-center justify-center min-h-screen pt-[95px] pb-[80px] px-6 text-center">
+            <h1 class="font-['Sora',sans-serif] font-extrabold text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight text-[#FF6B35]">
+                Level Up Your<br />
+                <span class="bg-gradient-to-r from-[#FF6B35] to-[#FF9F1C] bg-clip-text text-transparent">Gaming</span><br />
+                Library.
+            </h1>
 
-<body>
-    <img src="{{ asset('assets/whats-app-img.png') }}" alt="Decorative" class="whats-app-img" />
-    <div class="overlay-plus-blur"></div>
+            <p class="mt-4 max-w-[448px] font-['Inter',sans-serif] text-base sm:text-lg leading-relaxed text-[#D0D0D0]">
+                Daftar sekarang untuk mulai mengoleksi, memberi<br class="hidden sm:block" />
+                rating, dan menemukan game favorit baru Anda<br class="hidden sm:block" />
+                dalam database game tercanggih.
+            </p>
 
-    @include('components.navbar')
+            <div class="mt-10 flex items-center flex-wrap justify-center gap-4">
+                <div class="flex items-center">
+                    <button type="button" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#FF6B35]/60 bg-[#1E1E1E] hover:bg-[#FF6B35]/20 hover:scale-110 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl cursor-pointer" title="Gaming Console">🎮</button>
+                    <button type="button" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#FF6B35]/60 bg-[#1E1E1E] hover:bg-[#FF6B35]/20 hover:scale-110 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl cursor-pointer -ml-2 z-10" title="Arcade Games">🕹️</button>
+                    <button type="button" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#FF6B35]/60 bg-[#1E1E1E] hover:bg-[#FF6B35]/20 hover:scale-110 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl cursor-pointer -ml-2 z-20" title="Video Games">💾</button>
+                </div>
 
-    <div class="container">
-        <h1 class="container-title">
-            Level Up Your<br />
-            <span class="sub-text">Gaming<br /></span>
-            Library.
-        </h1>
-
-        <p class="container-text1">
-            Daftar sekarang untuk mulai mengoleksi, memberi<br />
-            rating, dan menemukan game favorit baru Anda<br />
-            dalam database game tercanggih.
-        </p>
-
-        <div class="container-container1">
-            <div class="container-container2">
-                <button class="container-btn container-btn-bg hover-bright" title="Gaming Console">🎮</button>
-                <button class="container-btn container-btn-margin1 hover-bright" title="Arcade Games">🕹️</button>
-                <button class="container-btn container-btn-margin2 hover-bright" title="Video Games">💾</button>
+                <p class="font-['Inter',sans-serif] text-sm text-[#A0A0A0]">Join +10,000 gamers today</p>
             </div>
-
-            <p class="container-text2">Join +10,000 gamers today</p>
         </div>
     </div>
-
-    @include('components.footer')
-</body>
-
-</html>
+@endsection
