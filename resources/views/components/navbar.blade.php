@@ -17,21 +17,25 @@
         </div>
 
         <div class="navbar-user">
-            <div class="user-welcome" id="userDropdownToggle">
-                <p class="text2">Welcome back,</p>
-                <p class="text3">Hi, {{ Auth::check() ? Auth::user()->name : 'User' }}!</p>
-            </div>
-            <div class="user-dropdown" id="userDropdown">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Logout
-                    </button>
-                </form>
-            </div>
+            @auth
+                <div class="user-welcome" id="userDropdownToggle">
+                    <p class="text2">Welcome back,</p>
+                    <p class="text3">Hi, {{ Auth::user()->name }}!</p>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="logout-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="nav-link login-btn">Login</a>
+            @endauth
         </div>
 
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
@@ -46,6 +50,15 @@
         <a href="{{ Route::has('myGames.index') ? route('myGames.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('myGames.*') ? 'active' : '' }}">My Games</a>
         <a href="{{ Route::has('priceCompare.index') ? route('priceCompare.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('priceCompare.*') ? 'active' : '' }}">Price Compare</a>
         <a href="{{ Route::has('personalScore.index') ? route('personalScore.index') : '#' }}" class="mobile-nav-link {{ request()->routeIs('personalScore.*') ? 'active' : '' }}">Personal Score</a>
+        @auth
+            <div class="mobile-nav-link">{{ Auth::user()->name }}</div>
+            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                @csrf
+                <button type="submit" class="mobile-nav-link w-full text-left m-0 cursor-pointer">Logout</button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="mobile-nav-link">Login</a>
+        @endauth
     </div>
 </nav>
 

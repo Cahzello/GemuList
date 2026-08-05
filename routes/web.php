@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MyGamesController;
@@ -14,12 +12,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [GameController::class, 'search'])->name('games.search');
 Route::get('/search/detail', [GameController::class, 'show'])->name('games.detail');
 
-Route::get('/my-games', [MyGamesController::class, 'index'])->name('myGames.index');
 Route::get('/price-compare', [PriceCompareController::class, 'index'])->name('priceCompare.index');
-Route::get('/personal-score', [PersonalScoreController::class, 'index'])->name('personalScore.index');
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
+Route::middleware('auth')->group(function () {
+    Route::get('/my-games', [MyGamesController::class, 'index'])->name('myGames.index');
+    Route::get('/personal-score', [PersonalScoreController::class, 'index'])->name('personalScore.index');
+});
 
-Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+require __DIR__.'/auth.php';

@@ -1,56 +1,45 @@
-# Plan: Refactor `routes/web.php` + Kandidat Controller
+# Plan: Autentikasi dengan Laravel Breeze (Blade)
 
-## Masalah saat ini
+## Scope
 
-1. Nama route ganda `search.index` di `/` dan `/search` — nama kedua menimpa yang pertama.
-2. Path `/search` didaftarkan dua kali dengan nama berbeda (`search.index` & `games.search`) — rawan konflik.
-3. Semua halaman memakai Closure di `web.php`; logika bisnis (filter `?q=`, trending 10 game, map deskripsi) ada di blok `@php` dalam blade.
-4. Login tidak punya handler POST — form `login.blade.php` POST ke route GET `login` (akan 405).
-5. Bug redirect: `RegisterController` mengarah ke `route('dashboard')` yang tidak ada.
-6. Logout pakai Closure (`Auth::logout()` + invalidate session) — pindah ke controller.
+**Masuk:** login, register, logout — redirect pasca login/register ke `games.search` (`/search`).
+**Skip:** forgot/reset password, verifikasi email (MustVerifyEmail nonaktif), halaman profil, dashboard Breeze.
 
-## Route target
+**Proteksi autentikasi (`middleware('auth')`):**
+- `GET /my-games` (`myGames.index`) + route asosiasinya.
+- `GET /personal-score` (`personalScore.index`) + route asosiasinya.
+- Guest yang membuka halaman tersebut diarahkan ke `route('login')`, lalu kembali via `intended()`.
 
-| Method | URI | Aksi | Nama |
-|---|---|---|---|
-| GET | `/` | `HomeController@index` (render `homepage.blade.php`) | `home` |
-| GET | `/search` | `GameController@search` (filter `?q=`) | `games.search` |
-| GET | `/search/detail` | `GameController@show` (detail + deskripsi) | `games.detail` |
-| GET | `/my-games` | `MyGamesController@index` | `myGames.index` |
-| GET | `/price-compare` | `PriceCompareController@index` | `priceCompare.index` |
-| GET | `/personal-score` | `PersonalScoreController@index` | `personalScore.index` |
-| GET | `/login` | `Auth\LoginController@showLoginForm` | `login` |
-| GET/POST | `/register` | `Auth\RegisterController` | `register` |
-| POST | `/logout` | `Auth\LoginController@logout` | `logout` |
+**Tetap publik (tanpa autentikasi):**
+- `/` (`home`), `/search` (`games.search`), `/search/detail` (`games.detail`), `/price-compare`, `/login`, `/register`.
+- Guest bebas mencari game & melihat detail.
 
-## Kandidat Controller (dibuat via `php artisan make:controller`)
+## Langkah
 
-- `HomeController` — `index()` → `view('homepage')`.
-- `GameController` — `search()` (filter `config('games.list')` oleh `?q=` + trending games), `show()` (detail game + deskripsi).
-- `MyGamesController` — `index()` → `view('myGames.index')`.
-- `PriceCompareController` — `index()` → `view('priceCompare.index')`.
-- `PersonalScoreController` — `index()` → `view('personalScore.index')`.
-- `Auth\LoginController` — `showLoginForm()` → `view('auth.login')`, `logout()` (pindahan dari Closure lama).
+1. Install Breeze: `composer require laravel/breeze --dev` → `php artisan breeze:install blade --pest --no-interaction`.
+2. Pulihkan file yang berisiko tertimpa Breeze:
+   - `resources/js/app.js` (Alpine + `import './personalScore'`).
+   - `resources/css/app.css` (`@theme` + `@import 'Mygames.css'`).
+   - Cek `vite.config.js` & `package.json`; `npm install` hanya bila perlu.
+3. Route:
+   - `bootstrap/app.php` → verifikasi `routes/auth.php` terdaftar.
+   - `routes/auth.php` → sisakan login/register/logout saja.
+   - `routes/web.php` → hapus route auth custom + route `/dashboard` & `/profile` Breeze; beri `middleware('auth')` pada `myGames.index` & `personalScore.index`; redirect pasca login/register → `games.search`.
+4. Hapus controller custom lama (`Auth/RegisterController.php`, `Auth/LoginController.php`) + controller Breeze tak terpakai (reset password, verify email, confirm password, profile).
+5. Hapus view tak terpakai: `auth/{forgot-password,reset-password,verify-email,confirm-password}.blade.php`, `profile/*`, `dashboard.blade.php`, `layouts/{app,navigation}.blade.php`.
+6. Restyle `layouts/guest.blade.php`, `auth/login.blade.php`, `auth/register.blade.php` ke tema gelap (bg `#141414`, aksen `#FF6B35`, font Sora/Inter, card auth custom; field register memakai `name`).
+7. Navbar (`components/navbar.blade.php`):
+   - Guest: tombol "Login" → `route('login')`.
+   - Logged in: "Hi, {Auth::user()->name}!" + dropdown Logout.
+   - Mobile menu menyesuaikan.
+8. Test: buang test Breeze untuk fitur yang di-skip (`PasswordResetTest`, `EmailVerificationTest`, `PasswordConfirmationTest`, `ProfileTest`); sesuaikan redirect assertion `AuthenticationTest`/`RegistrationTest` → `/search`.
+9. Verifikasi:
+   - `php artisan test --compact` hijau.
+   - `npm run build`.
+   - Alur manual: register → `/search`, login → `/search`, logout → `/`; guest search tetap 200; `/my-games` & `/personal-score` redirect ke login saat guest lalu kembali setelah login.
+   - `vendor/bin/pint --format agent`.
 
-## Perubahan lain
+## Catatan
 
-- `Auth\RegisterController` — redirect `route('dashboard')` → `route('home')`.
-- `components/navbar.blade.php` — `search.index` → `games.search`, `routeIs('search.*')` → `routeIs('games.*')`.
-- View search (`search/index`, `search/game-search`, `search/search-results`, `search/detail-game`) — terima data dari controller, hapus blok `@php` logika.
-
-## Konvensi
-
-- Semua pembuatan file yang punya fitur Laravel memakai `php artisan` (mis. `make:controller`), tidak menulis file dari awal.
-- Tidak ada model/resource baru yang di-generate → controller dibuat tanpa `-m`/`-r`.
-
-## Out of scope (dicatat)
-
-- POST `/login` belum punya handler — perlu `AuthController@login` (`Auth::attempt` + remember) tersendiri nanti.
-
-## Verifikasi
-
-1. `php artisan route:list` — nama route bersih & unik.
-2. `npm run build` — manifest build sukses.
-3. Cek semua halaman (/, /search?q=, /my-games, /price-compare, /personal-score, /login, /register) status 200.
-4. `php artisan test --compact` — test lolos.
-5. `vendor/bin/pint --format agent` — sesuai gaya repo.
+- Tidak ada migrasi baru (tabel `users`, `password_reset_tokens`, `sessions` sudah ada).
+- Breeze menambah dependency dev `laravel/breeze`.
