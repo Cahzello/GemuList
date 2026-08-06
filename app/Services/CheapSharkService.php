@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 
 class CheapSharkService
 {
+    private const MAX_CANDIDATES = 10;
+
     public const STORE_HOMEPAGES = [
         'Steam' => 'https://store.steampowered.com',
         'GamersGate' => 'https://www.gamersgate.com',
@@ -66,72 +68,73 @@ class CheapSharkService
 
     public function pricesFor(string $title): void
     {
-        try {
-            $gameMatch = $this->findGame($title);
+        $rate = $this->exchangeRate->idr();
 
-            if ($gameMatch === null) {
-                return;
-            }
+        foreach ($this->findGames($title) as $candidate) {
+            try {
+                $deals = $this->dealsFor($candidate['external']);
 
-            $game = Game::updateOrCreate(
-                ['game_name' => $gameMatch['external']],
-                ['thumbnail' => $gameMatch['thumb'] ?? ''],
-            );
+                if ($deals === []) {
+                    continue;
+                }
 
-            $rate = $this->exchangeRate->idr();
+                $game = Game::updateOrCreate(
+                    ['game_name' => $candidate['external']],
+                    ['thumbnail' => $candidate['thumb'] ?? ''],
+                );
 
-            collect($this->dealsFor($gameMatch['external']))
-                ->each(function (array $deal) use ($game, $rate): void {
-                    $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
-
-                    if ($store === null) {
-                        $this->syncStores();
+                collect($deals)
+                    ->each(function (array $deal) use ($game, $rate): void {
                         $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
-                    }
 
-                    if ($store === null) {
-                        return;
-                    }
+                        if ($store === null) {
+                            $this->syncStores();
+                            $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
+                        }
 
-                    GamePrice::updateOrCreate(
-                        ['id_game' => $game->id_game, 'id_store' => $store->id_store],
-                        [
-                            'price' => round((float) ($deal['salePrice'] ?? 0) * $rate),
-                            'retailPrice' => round((float) ($deal['normalPrice'] ?? 0) * $rate),
-                        ],
-                    );
-                });
-        } catch (\Throwable $e) {
-            Log::warning('CheapShark price sync failed', ['title' => $title, 'error' => $e->getMessage()]);
+                        if ($store === null) {
+                            return;
+                        }
+
+                        GamePrice::updateOrCreate(
+                            ['id_game' => $game->id_game, 'id_store' => $store->id_store],
+                            [
+                                'price' => round((float) ($deal['salePrice'] ?? 0) * $rate),
+                                'retailPrice' => round((float) ($deal['normalPrice'] ?? 0) * $rate),
+                            ],
+                        );
+                    });
+            } catch (\Throwable $e) {
+                Log::warning('CheapShark price sync failed', [
+                    'title' => $candidate['external'],
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 
     /**
-     * @return array{external: string, thumb: string}|null
+     * @return list<array{external: string, thumb: string}>
      */
-    private function findGame(string $title): ?array
+    private function findGames(string $title): array
     {
         $response = $this->client()->get(config('services.cheapshark.url').'/games', ['title' => $title]);
 
         if ($response->failed()) {
             Log::warning('CheapShark game lookup failed', ['title' => $title, 'status' => $response->status()]);
 
-            return null;
+            return [];
         }
 
-        $matches = collect($response->json());
-
-        if ($matches->isEmpty()) {
-            return null;
-        }
-
-        $exact = $matches->firstWhere(fn (array $match): bool => strtolower((string) $match['external']) === strtolower($title));
-        $match = $exact ?? $matches->first();
-
-        return [
-            'external' => (string) ($match['external'] ?? ''),
-            'thumb' => (string) ($match['thumb'] ?? ''),
-        ];
+        return collect($response->json())
+            ->filter(fn (array $match): bool => (string) ($match['external'] ?? '') !== '')
+            ->take(self::MAX_CANDIDATES)
+            ->map(fn (array $match): array => [
+                'external' => (string) $match['external'],
+                'thumb' => (string) ($match['thumb'] ?? ''),
+            ])
+            ->values()
+            ->all();
     }
 
     /**
