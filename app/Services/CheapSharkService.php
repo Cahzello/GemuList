@@ -117,6 +117,49 @@ class CheapSharkService
     }
 
     /**
+     * Fill in missing deal URLs for existing price rows of an exact title match.
+     */
+    public function backfillDealUrls(string $title): void
+    {
+        try {
+            $game = Game::where('game_name', $title)->first();
+
+            if ($game === null) {
+                return;
+            }
+
+            $response = $this->client()->get(config('services.cheapshark.url').'/games', ['title' => $title]);
+
+            if ($response->failed()) {
+                Log::warning('CheapShark game lookup failed (backfill)', ['title' => $title, 'status' => $response->status()]);
+
+                return;
+            }
+
+            $exact = collect($response->json())
+                ->firstWhere(fn (array $match): bool => strtolower((string) ($match['external'] ?? '')) === strtolower($title));
+
+            if ($exact === null) {
+                return;
+            }
+
+            foreach ($this->dealsFor($exact['external']) as $deal) {
+                $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
+
+                if ($store === null || ! isset($deal['dealID'])) {
+                    continue;
+                }
+
+                GamePrice::where('id_game', $game->id_game)
+                    ->where('id_store', $store->id_store)
+                    ->update(['dealUrl' => 'https://www.cheapshark.com/redirect?dealID='.$deal['dealID']]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('CheapShark deal url backfill failed', ['title' => $title, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
      * @return list<array{external: string, thumb: string}>
      */
     private function findGames(string $title): array

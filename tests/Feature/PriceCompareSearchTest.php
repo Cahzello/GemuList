@@ -101,3 +101,43 @@ it('returns multiple games with prices from a single query', function () {
     expect($urls)->toContain('https://www.cheapshark.com/redirect?dealID=deal-Far Cry 3')
         ->and($urls)->toContain('https://www.cheapshark.com/redirect?dealID=deal-Far Cry 4');
 });
+
+it('backfills missing deal urls for locally cached games', function () {
+    $game = Game::factory()->create(['game_name' => 'Elden Ring']);
+    $store = Store::factory()->create(['cheapshark_id' => 1, 'store_name' => 'Steam']);
+
+    GamePrice::factory()->create([
+        'id_game' => $game->id_game,
+        'id_store' => $store->id_store,
+        'price' => 400000,
+        'retailPrice' => 500000,
+        'dealUrl' => null,
+    ]);
+
+    Http::fake([
+        'www.cheapshark.com/api/1.0/games*' => Http::response([
+            ['external' => 'Elden Ring', 'thumb' => 'https://example.com/elden.jpg'],
+        ]),
+        'www.cheapshark.com/api/1.0/deals*' => Http::response([
+            [
+                'dealID' => 'backfill123',
+                'external' => 'Elden Ring',
+                'title' => 'Elden Ring',
+                'storeID' => 1,
+                'salePrice' => '25.00',
+                'normalPrice' => '59.99',
+            ],
+        ]),
+        'open.er-api.com/*' => Http::response([
+            'result' => 'success',
+            'rates' => ['IDR' => 16000],
+        ]),
+    ]);
+
+    $this->get(route('priceCompare.search', ['q' => 'Elden']))
+        ->assertOk()
+        ->assertJsonFragment(['url' => 'https://www.cheapshark.com/redirect?dealID=backfill123']);
+
+    expect(GamePrice::where('id_game', $game->id_game)->first()->dealUrl)
+        ->toBe('https://www.cheapshark.com/redirect?dealID=backfill123');
+});
