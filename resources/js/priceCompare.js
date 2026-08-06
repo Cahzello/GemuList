@@ -185,7 +185,7 @@ document.getElementById("searchInput").addEventListener("input", function () {
     
     // Auto-switch to games tab when searching on mobile
     switchToTab('games');
-  }, 600);
+  }, 1000);
 });
 
 
