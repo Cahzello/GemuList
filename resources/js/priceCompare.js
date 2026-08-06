@@ -4,8 +4,11 @@ let currentGames = [];
 
 // ---------- Helpers ----------
 
+const rupiahFormatter = new Intl.NumberFormat("id-ID");
+
 function formatRupiah(amount) {
-  return "Rp " + amount.toLocaleString("id-ID");
+  const value = Number(amount) || 0;
+  return "Rp " + rupiahFormatter.format(value);
 }
 
 function getStoreIcon(storeName) {
