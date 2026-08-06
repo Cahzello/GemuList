@@ -183,7 +183,7 @@ document.getElementById("searchInput").addEventListener("input", function () {
     
     // Auto-switch to games tab when searching on mobile
     switchToTab('games');
-  }, 250);
+  }, 600);
 });
 
 
@@ -239,6 +239,8 @@ function initMobileTabs() {
 // ---------- Init ----------
 
 document.addEventListener("DOMContentLoaded", function() {
-  renderResults("");
+  document.getElementById("resultsList").innerHTML =
+    '<p class="text-[#808080] text-sm p-2">Search a game to compare prices.</p>';
+  renderStore(null);
   initMobileTabs();
 });
