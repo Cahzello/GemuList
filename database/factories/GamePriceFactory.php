@@ -26,6 +26,7 @@ class GamePriceFactory extends Factory
             'id_store' => Store::factory(),
             'price' => $price,
             'retailPrice' => $price + fake()->numberBetween(0, 200000),
+            'dealUrl' => 'https://www.cheapshark.com/redirect?dealID='.fake()->uuid(),
         ];
     }
 }

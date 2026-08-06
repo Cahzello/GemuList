@@ -101,6 +101,9 @@ class CheapSharkService
                             [
                                 'price' => round((float) ($deal['salePrice'] ?? 0) * $rate),
                                 'retailPrice' => round((float) ($deal['normalPrice'] ?? 0) * $rate),
+                                'dealUrl' => isset($deal['dealID'])
+                                    ? 'https://www.cheapshark.com/redirect?dealID='.$deal['dealID']
+                                    : null,
                             ],
                         );
                     });

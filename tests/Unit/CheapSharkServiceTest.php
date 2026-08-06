@@ -49,6 +49,7 @@ it('stores real prices converted to IDR from deals', function () {
         ]),
         'www.cheapshark.com/api/1.0/deals*' => Http::response([
             [
+                'dealID' => 'abc123deal',
                 'external' => 'Elden Ring',
                 'title' => 'Elden Ring',
                 'storeID' => 1,
@@ -73,7 +74,8 @@ it('stores real prices converted to IDR from deals', function () {
 
     expect($price)->not->toBeNull()
         ->and((int) $price->price)->toBe(160000)
-        ->and((int) $price->retailPrice)->toBe((int) round(59.99 * 16000));
+        ->and((int) $price->retailPrice)->toBe((int) round(59.99 * 16000))
+        ->and($price->dealUrl)->toBe('https://www.cheapshark.com/redirect?dealID=abc123deal');
 });
 
 it('does nothing when the game is not found on CheapShark', function () {

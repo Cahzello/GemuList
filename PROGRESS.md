@@ -63,3 +63,13 @@ php artisan test --compact
 vendor/bin/pint --dirty --format agent
 npm run build
 ```
+
+## Fitur / Perbaikan Terbaru: Link Deal CheapShark (`dealUrl`)
+
+- Tombol **"GO TO STORE"** di Price Compare kini memakai **link redirect deal CheapShark** (`https://www.cheapshark.com/redirect?dealID=<dealID>`), bukan homepage store.
+- Migration baru `add_deal_url_to_game_prices_table` — kolom `dealUrl VARCHAR(255) NULL` di tabel `game_prices` (camelCase, konsisten dgn `retailPrice`).
+- `CheapSharkService::pricesFor()` menyimpan `dealUrl` dari `$deal['dealID']` saat `GamePrice::updateOrCreate`.
+- `GamePrice` model: `dealUrl` masuk `$fillable`; factory mendapat default redirect URL.
+- `PriceCompareController::gamesWithPrices()`: `url = dealUrl ?: store.url` (baris lama tanpa `dealUrl` fallback ke homepage store).
+- Update test: assert `dealUrl` tersimpan di DB (unit) & muncul sebagai `url` di JSON (feature).
+- Verifikasi: `php artisan migrate` ✅, 44 test / 100 assertion ✅, pint ✅. Tidak ada perubahan frontend (`priceCompare.js` tetap memakai `store.url`).

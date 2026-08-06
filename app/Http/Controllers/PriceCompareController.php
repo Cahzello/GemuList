@@ -56,7 +56,7 @@ class PriceCompareController extends Controller
                         'icon' => $price->store->icon,
                         'price' => (int) $price->price,
                         'originalPrice' => (int) $price->retailPrice,
-                        'url' => $price->store->url,
+                        'url' => $price->dealUrl ?: $price->store->url,
                     ])
                     ->all(),
             ]);

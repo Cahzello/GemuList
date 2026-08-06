@@ -27,6 +27,7 @@ class GamePrice extends Model
         'id_store',
         'price',
         'retailPrice',
+        'dealUrl',
     ];
 
     /**

@@ -44,6 +44,7 @@ it('fetches and caches prices from CheapShark when no local prices exist', funct
         ]),
         'www.cheapshark.com/api/1.0/deals*' => Http::response([
             [
+                'dealID' => 'deal123',
                 'external' => 'Elden Ring',
                 'title' => 'Elden Ring',
                 'storeID' => 1,
@@ -60,7 +61,7 @@ it('fetches and caches prices from CheapShark when no local prices exist', funct
     $this->get(route('priceCompare.search', ['q' => 'Elden Ring']))
         ->assertOk()
         ->assertJsonPath('games.0.title', 'Elden Ring')
-        ->assertJsonFragment(['store' => 'Steam']);
+        ->assertJsonFragment(['store' => 'Steam', 'url' => 'https://www.cheapshark.com/redirect?dealID=deal123']);
 
     $game = Game::where('game_name', 'Elden Ring')->first();
 
@@ -79,7 +80,7 @@ it('returns multiple games with prices from a single query', function () {
             $title = $request->data()['title'] ?? '';
 
             return Http::response([
-                ['external' => $title, 'title' => $title, 'storeID' => 1, 'salePrice' => '10.00', 'normalPrice' => '19.99'],
+                ['dealID' => 'deal-'.$title, 'external' => $title, 'title' => $title, 'storeID' => 1, 'salePrice' => '10.00', 'normalPrice' => '19.99'],
             ]);
         },
         'open.er-api.com/*' => Http::response([
@@ -94,4 +95,9 @@ it('returns multiple games with prices from a single query', function () {
 
     expect($games)->toHaveCount(2)
         ->and(collect($games)->pluck('title')->all())->toContain('Far Cry 3', 'Far Cry 4');
+
+    $urls = collect($games)->flatMap(fn (array $game): array => collect($game['stores'])->pluck('url')->all());
+
+    expect($urls)->toContain('https://www.cheapshark.com/redirect?dealID=deal-Far Cry 3')
+        ->and($urls)->toContain('https://www.cheapshark.com/redirect?dealID=deal-Far Cry 4');
 });
