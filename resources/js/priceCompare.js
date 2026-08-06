@@ -63,7 +63,9 @@ function renderResults(search) {
     label.textContent = search.trim() ? "SEARCH RESULT" : "GAME LIST";
   }
 
-  list.innerHTML = '<p class="text-[#808080] text-sm p-2">Loading...</p>';
+  renderStore(null);
+
+  list.innerHTML = '<div class="flex items-center justify-center py-4"><div class="spinner" role="status"></div></div>';
 
   fetchGames(search).then(function (gameList) {
     currentGames = gameList;
