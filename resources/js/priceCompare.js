@@ -1,10 +1,14 @@
 let selectedId = null;
 let debounceTimer = null;
+let currentGames = [];
 
 // ---------- Helpers ----------
 
+const rupiahFormatter = new Intl.NumberFormat("id-ID");
+
 function formatRupiah(amount) {
-  return "Rp " + amount.toLocaleString("id-ID");
+  const value = Number(amount) || 0;
+  return "Rp " + rupiahFormatter.format(value);
 }
 
 function getStoreIcon(storeName) {
@@ -33,117 +37,115 @@ function calculateDiscount(originalPrice, currentPrice) {
   return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
 }
 
-// ---------- Data (langsung dari db.js, tanpa fetch) ----------
+// ---------- Data (dari server via CheapShark fallback) ----------
 
-function getGames(search) {
-  var q = (search || "").trim().toLowerCase();
-  var dbGames = window.games || [];
-  return dbGames
-    .filter(function (g) { return g.title.toLowerCase().includes(q); })
-    .map(function (g) {
-      return {
-        id:          g.id,
-        title:       g.title,
-        thumbnail:   g.thumbnail,
-        lowestPrice: Math.min.apply(null, g.stores.map(function (s) { return s.price; }))
-      };
+function fetchGames(search) {
+  var url = new URL(window.priceCompareSearchUrl || "/price-compare/search", window.location.origin);
+  if (search) url.searchParams.set("q", search);
+
+  return fetch(url, { headers: { "Accept": "application/json" } })
+    .then(function (response) {
+      if (!response.ok) return [];
+      return response.json().then(function (data) {
+        return data.games || [];
+      });
     })
-    .sort(function (a, b) {
-      return a.title.localeCompare(b.title);
+    .catch(function () {
+      return [];
     });
-}
-
-function getStoresForGame(gameId) {
-  var dbGames = window.games || [];
-  var game = dbGames.find(function (g) { return g.id === gameId; });
-  if (!game) return null;
-  return { id: game.id, title: game.title, stores: game.stores };
 }
 
 // ---------- Render: Search Results ----------
 
 function renderResults(search) {
   var list = document.getElementById("resultsList");
-  var gameList = getGames(search);
-  
+
   // Update label based on search state
   var label = document.querySelector(".results-panel span");
   if (label) {
     label.textContent = search.trim() ? "SEARCH RESULT" : "GAME LIST";
   }
 
-  list.innerHTML = "";
+  renderStore(null);
 
-  if (gameList.length === 0) {
-    list.innerHTML = '<p class="text-[#808080] text-sm p-2">No games found.</p>';
-    return;
-  }
+  list.innerHTML = '<div class="flex items-center justify-center py-4"><div class="spinner" role="status"></div></div>';
 
-  // Don't auto-select on initial load (when search is empty)
-  if (search.trim() && (!selectedId || !gameList.find(function (g) { return g.id === selectedId; }))) {
-    selectedId = gameList[0].id;
-    renderStore(selectedId);
-  } else if (!search.trim() && !selectedId) {
-    // Clear store panel when no search and no selection
-    renderStore(null);
-  }
+  fetchGames(search).then(function (gameList) {
+    currentGames = gameList;
+    list.innerHTML = "";
 
-  gameList.forEach(function (game) {
-    var card = document.createElement("div");
-    card.className = "flex items-center gap-3.5 bg-[#1E1E1E] border border-[#2a2a2a] rounded-xl p-3 cursor-pointer transition-all hover:border-[#33385a] flex-shrink-0 relative z-[1]" + 
-      (game.id === selectedId ? " !border-[#FF6B35] shadow-[0_0_0_1px_rgba(255,107,53,0.25),inset_0_0_20px_rgba(255,107,53,0.08)]" : "");
-    card.dataset.id = game.id;
-    
-    card.innerHTML =
-      '<img class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-[#232645]" src="' + game.thumbnail + '" alt="' + game.title + '">' +
-      '<div class="flex flex-col gap-1 min-w-0">' +
-        '<span class="text-sm font-semibold text-[#F4F4F4] whitespace-nowrap overflow-hidden text-ellipsis">' + game.title + '</span>' +
-        '<span class="text-xs text-[#C0C0C0]">Lowest Price : <span class="text-[#FF9F1C] font-semibold">' + formatRupiah(game.lowestPrice) + '</span></span>' +
-      '</div>';
+    if (gameList.length === 0) {
+      list.innerHTML = '<p class="text-[#808080] text-sm p-2">No games found.</p>';
+      return;
+    }
 
-    card.addEventListener("click", function () {
-      selectedId = game.id;
-      var cards = list.querySelectorAll("[data-id]");
-      cards.forEach(function (c) {
-        if (c.dataset.id === selectedId) {
-          c.className = "flex items-center gap-3.5 bg-[#1E1E1E] border border-[#2a2a2a] rounded-xl p-3 cursor-pointer transition-all hover:border-[#33385a] flex-shrink-0 relative z-[1] !border-[#FF6B35] shadow-[0_0_0_1px_rgba(255,107,53,0.25),inset_0_0_20px_rgba(255,107,53,0.08)]";
-        } else {
-          c.className = "flex items-center gap-3.5 bg-[#1E1E1E] border border-[#2a2a2a] rounded-xl p-3 cursor-pointer transition-all hover:border-[#33385a] flex-shrink-0 relative z-[1]";
-        }
-      });
-      renderStore(game.id);
+    // Don't auto-select on initial load (when search is empty)
+    if (search.trim() && (!selectedId || !gameList.find(function (g) { return g.id === selectedId; }))) {
+      selectedId = gameList[0].id;
+      renderStore(gameList[0]);
+    } else if (!search.trim() && !selectedId) {
+      // Clear store panel when no search and no selection
+      renderStore(null);
+    }
+
+    gameList.forEach(function (game) {
+      var card = document.createElement("div");
+      card.className = "flex items-center gap-3.5 bg-[#1E1E1E] border border-[#2a2a2a] rounded-xl p-3 cursor-pointer transition-all hover:border-[#33385a] flex-shrink-0 relative z-[1]" + 
+        (game.id === selectedId ? " !border-[#FF6B35] shadow-[0_0_0_1px_rgba(255,107,53,0.25),inset_0_0_20px_rgba(255,107,53,0.08)]" : "");
+      card.dataset.id = game.id;
       
-      // Auto-switch to stores tab on mobile
-      switchToTab('stores');
-    });
+      card.innerHTML =
+        '<img class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-[#232645]" src="' + game.thumbnail + '" alt="' + game.title + '">' +
+        '<div class="flex flex-col gap-1 min-w-0">' +
+          '<span class="text-sm font-semibold text-[#F4F4F4] whitespace-nowrap overflow-hidden text-ellipsis">' + game.title + '</span>' +
+          '<span class="text-xs text-[#C0C0C0]">Lowest Price : <span class="text-[#FF9F1C] font-semibold">' + formatRupiah(game.lowestPrice) + '</span></span>' +
+        '</div>';
 
-    list.appendChild(card);
+      card.addEventListener("click", function () {
+        selectedId = game.id;
+        var cards = list.querySelectorAll("[data-id]");
+        cards.forEach(function (c) {
+          if (c.dataset.id === selectedId) {
+            c.className = "flex items-center gap-3.5 bg-[#1E1E1E] border border-[#2a2a2a] rounded-xl p-3 cursor-pointer transition-all hover:border-[#33385a] flex-shrink-0 relative z-[1] !border-[#FF6B35] shadow-[0_0_0_1px_rgba(255,107,53,0.25),inset_0_0_20px_rgba(255,107,53,0.08)]";
+          } else {
+            c.className = "flex items-center gap-3.5 bg-[#1E1E1E] border border-[#2a2a2a] rounded-xl p-3 cursor-pointer transition-all hover:border-[#33385a] flex-shrink-0 relative z-[1]";
+          }
+        });
+        renderStore(game);
+        
+        // Auto-switch to stores tab on mobile
+        switchToTab('stores');
+      });
+
+      list.appendChild(card);
+    });
   });
 }
 
 // ---------- Render: Store Panel ----------
 
-function renderStore(gameId) {
+function renderStore(game) {
   var titleEl   = document.getElementById("storeGameTitle");
   var storeList = document.getElementById("storeList");
 
-  var data = getStoresForGame(gameId);
-  if (!data) {
+  if (!game || !game.stores || game.stores.length === 0) {
     titleEl.textContent  = "—";
     storeList.innerHTML  = '<li class="text-[#808080] text-sm py-2 text-center">Select a game to compare prices across stores.</li>';
     return;
   }
 
-  titleEl.textContent = data.title;
+  titleEl.textContent = game.title;
   storeList.innerHTML = "";
 
-  var minPrice = Math.min.apply(null, data.stores.map(function (s) { return s.price; }));
+  var minPrice = Math.min.apply(null, game.stores.map(function (s) { return s.price; }));
 
-  data.stores.forEach(function (store) {
+  game.stores.forEach(function (store) {
     var isLowest = store.price === minPrice;
     
-    // Gunakan icon dari database, atau fallback ke getStoreIcon
-    var icon = store.icon || getStoreIcon(store.store);
+    // Gunakan icon dari database (URL), atau fallback ke getStoreIcon (SVG)
+    var icon = store.icon
+      ? '<img class="w-4 h-4 flex-shrink-0 rounded-full" src="' + store.icon + '" alt="' + store.store + '">'
+      : getStoreIcon(store.store);
     
     // Hitung diskon persentase secara otomatis dari originalPrice dan price
     var discountPercent = calculateDiscount(store.originalPrice, store.price);
@@ -186,7 +188,7 @@ document.getElementById("searchInput").addEventListener("input", function () {
     
     // Auto-switch to games tab when searching on mobile
     switchToTab('games');
-  }, 250);
+  }, 1000);
 });
 
 
@@ -242,10 +244,8 @@ function initMobileTabs() {
 // ---------- Init ----------
 
 document.addEventListener("DOMContentLoaded", function() {
-  // Wait a bit to ensure dbPriceCompare.js has loaded
-  setTimeout(function() {
-    console.log("Games loaded:", window.games ? window.games.length : 0);
-    renderResults("");
-    initMobileTabs();
-  }, 100);
+  document.getElementById("resultsList").innerHTML =
+    '<p class="text-[#808080] text-sm p-2">Search a game to compare prices.</p>';
+  renderStore(null);
+  initMobileTabs();
 });

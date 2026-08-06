@@ -13,11 +13,13 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/framework (LARAVEL) - v13
 - laravel/prompts (PROMPTS) - v0
 - laravel/boost (BOOST) - v2
+- laravel/breeze (BREEZE) - v2
 - laravel/mcp (MCP) - v0
 - laravel/pail (PAIL) - v1
 - laravel/pint (PINT) - v1
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
+- alpinejs (ALPINEJS) - v3
 - tailwindcss (TAILWINDCSS) - v4
 
 ## Conventions
@@ -127,3 +129,18 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+<user-guidelines>
+
+## What to do
+- Follow user request
+
+## Warning
+- Before making any changes, please read all throughly all files assosiated with user request, not all.
+
+## Laravel convention
+- Whenever Laravel provides a feature (e.g. `php artisan make:controller`, `make:test`, `make:model`), use the artisan command instead of writing the file from scratch. Only write the file manually when no artisan command exists.
+
+## After making changes
+- Always verify again is your changes is correct what user request it?
+/<user-guidelines>

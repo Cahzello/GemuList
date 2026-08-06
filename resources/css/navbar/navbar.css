@@ -86,6 +86,25 @@
 	display: none;
 }
 
+.login-btn {
+	color: #F4F4F4;
+	font-weight: 600;
+	background: linear-gradient(135deg, #FF6B35 0%, #FF9F1C 100%);
+	padding: 10px 24px;
+	border-radius: 10px;
+	border: 1px solid #2a2a2a;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	white-space: nowrap;
+}
+
+.login-btn:hover {
+	color: #F4F4F4;
+	transform: scale(1.03);
+	filter: brightness(1.1);
+}
+
 /* User Section */
 .navbar-user {
 	display: flex;

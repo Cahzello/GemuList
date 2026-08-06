@@ -80,7 +80,11 @@
 
     <x-footer />
 
-    @vite(['resources/js/dbPriceCompare.js', 'resources/js/priceCompare.js'])
+    <script>
+        window.priceCompareSearchUrl = @json(route('priceCompare.search'));
+    </script>
+
+    @vite(['resources/js/priceCompare.js'])
 </body>
 
 </html>
