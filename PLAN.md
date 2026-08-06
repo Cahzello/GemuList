@@ -55,3 +55,32 @@
 - `GameFactory` & `GamePriceFactory` tetap dipakai test, tidak dihapus.
 - Struktur kolom `games` tidak berubah (dedup berbasis `game_name`).
 - CheapShark: harga per store lewat endpoint `/deals`; store aktif yang dipakai: Steam(1), GamersGate(2), GreenManGaming(3), GOG(7), Humble Store(11), Uplay(13), Fanatical(15), WinGameStore(21), GameBillet(23), Epic Games Store(25), Gamesplanet(27), Gamesload(28), IndieGala(30), DreamGame(35).
+
+---
+
+# Plan: Simpan Link Deal CheapShark (`dealUrl`) di Database
+
+## Scope
+
+- Tombol **"GO TO STORE"** di halaman Price Compare memakai **link redirect deal dari CheapShark** (`https://www.cheapshark.com/redirect?dealID=<dealID>`) — bukan homepage store.
+- Link deal disimpan **di kolom `dealUrl` tabel `game_prices`** (MySQL). Kolom nullable; baris lama fallback ke homepage store.
+
+## Perubahan Database (MySQL)
+
+- Tabel `game_prices` bertambah **1 kolom**: `dealUrl VARCHAR(255) NULL`.
+- Tabel lain (`games`, `stores`, `my_games`, `users`) tidak berubah.
+
+## Langkah
+
+1. **Migration** — `add_deal_url_to_game_prices_table`: `$table->string('dealUrl')->nullable()->after('retailPrice')`.
+2. **Model** `GamePrice` — tambah `dealUrl` ke `$fillable`.
+3. **Factory** `GamePriceFactory` — default `dealUrl` berupa redirect URL acak.
+4. **Service** `CheapSharkService::pricesFor()` — saat `GamePrice::updateOrCreate`, simpan `dealUrl` dari `$deal['dealID']`.
+5. **Controller** `PriceCompareController::gamesWithPrices()` — `url` memakai `$price->dealUrl ?: $price->store->url`.
+6. **Testing (Pest)** — update fake `/deals` dengan `dealID`; assert `dealUrl` tersimpan di DB dan muncul sebagai `url` di JSON.
+7. **Verifikasi** — `php artisan migrate`, `php artisan test --compact`, `vendor/bin/pint --dirty --format agent`.
+
+## Catatan
+
+- Tidak ada perubahan frontend (`priceCompare.js` tetap memakai `store.url`).
+- Harga & link deal hanya terisi saat game di-fetch dari CheapShark; data seed lama tidak memiliki `dealUrl` (fallback homepage store).

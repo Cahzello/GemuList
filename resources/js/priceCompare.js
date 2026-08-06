@@ -4,8 +4,11 @@ let currentGames = [];
 
 // ---------- Helpers ----------
 
+const rupiahFormatter = new Intl.NumberFormat("id-ID");
+
 function formatRupiah(amount) {
-  return "Rp " + amount.toLocaleString("id-ID");
+  const value = Number(amount) || 0;
+  return "Rp " + rupiahFormatter.format(value);
 }
 
 function getStoreIcon(storeName) {
@@ -63,7 +66,9 @@ function renderResults(search) {
     label.textContent = search.trim() ? "SEARCH RESULT" : "GAME LIST";
   }
 
-  list.innerHTML = '<p class="text-[#808080] text-sm p-2">Loading...</p>';
+  renderStore(null);
+
+  list.innerHTML = '<div class="flex items-center justify-center py-4"><div class="spinner" role="status"></div></div>';
 
   fetchGames(search).then(function (gameList) {
     currentGames = gameList;
@@ -183,7 +188,7 @@ document.getElementById("searchInput").addEventListener("input", function () {
     
     // Auto-switch to games tab when searching on mobile
     switchToTab('games');
-  }, 250);
+  }, 1000);
 });
 
 
@@ -239,6 +244,8 @@ function initMobileTabs() {
 // ---------- Init ----------
 
 document.addEventListener("DOMContentLoaded", function() {
-  renderResults("");
+  document.getElementById("resultsList").innerHTML =
+    '<p class="text-[#808080] text-sm p-2">Search a game to compare prices.</p>';
+  renderStore(null);
   initMobileTabs();
 });

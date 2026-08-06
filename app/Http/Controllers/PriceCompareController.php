@@ -30,6 +30,19 @@ class PriceCompareController extends Controller
             $games = $this->gamesWithPrices($q);
         }
 
+        if ($q !== '') {
+            $missingDealUrls = Game::query()
+                ->whereHas('gamePrices', fn ($query) => $query->whereNull('dealUrl'))
+                ->where('game_name', 'like', "%{$q}%")
+                ->get();
+
+            $missingDealUrls->each(fn (Game $game) => $this->cheapshark->backfillDealUrls($game->game_name));
+
+            if ($missingDealUrls->isNotEmpty()) {
+                $games = $this->gamesWithPrices($q);
+            }
+        }
+
         return response()->json(['games' => $games->values()]);
     }
 
@@ -56,7 +69,7 @@ class PriceCompareController extends Controller
                         'icon' => $price->store->icon,
                         'price' => (int) $price->price,
                         'originalPrice' => (int) $price->retailPrice,
-                        'url' => $price->store->url,
+                        'url' => $price->dealUrl ?: $price->store->url,
                     ])
                     ->all(),
             ]);
