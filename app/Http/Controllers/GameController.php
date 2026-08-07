@@ -33,7 +33,7 @@ class GameController extends Controller
 
         $games = $this->localGames($keyword);
 
-        if ($keyword !== '' && $games->isEmpty()) {
+        if ($keyword !== '') {
             $this->importFromSteam($keyword);
             $games = $this->localGames($keyword);
         }
@@ -67,13 +67,15 @@ class GameController extends Controller
     private function importFromSteam(string $keyword): void
     {
         foreach ($this->steam->search($keyword) as $game) {
-            Game::updateOrCreate(
-                ['game_name' => $game['title']],
-                [
-                    'thumbnail' => $game['image'],
-                    'steam_appid' => $game['steam_appid'] ?? null,
-                ],
-            );
+            if (Game::where('steam_appid', $game['steam_appid'])->exists()) {
+                continue;
+            }
+
+            Game::create([
+                'game_name' => mb_substr($game['title'], 0, 100),
+                'thumbnail' => $game['image'],
+                'steam_appid' => $game['steam_appid'],
+            ]);
         }
     }
 
