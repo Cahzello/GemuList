@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\MyGame;
-use App\Services\RawgService;
+use App\Services\SteamStoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +25,7 @@ class GameController extends Controller
         'The Last of Us Part I',
     ];
 
-    public function __construct(private RawgService $rawg) {}
+    public function __construct(private SteamStoreService $steam) {}
 
     public function search(Request $request): View
     {
@@ -34,7 +34,7 @@ class GameController extends Controller
         $games = $this->localGames($keyword);
 
         if ($keyword !== '' && $games->isEmpty()) {
-            $this->importFromRawg($keyword);
+            $this->importFromSteam($keyword);
             $games = $this->localGames($keyword);
         }
 
@@ -64,12 +64,15 @@ class GameController extends Controller
             ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
     }
 
-    private function importFromRawg(string $keyword): void
+    private function importFromSteam(string $keyword): void
     {
-        foreach ($this->rawg->search($keyword) as $game) {
+        foreach ($this->steam->search($keyword) as $game) {
             Game::updateOrCreate(
                 ['game_name' => $game['title']],
-                ['thumbnail' => $game['image']],
+                [
+                    'thumbnail' => $game['image'],
+                    'steam_appid' => $game['steam_appid'] ?? null,
+                ],
             );
         }
     }
@@ -104,13 +107,26 @@ class GameController extends Controller
         $inLibrary = $game !== null && Auth::check()
             && MyGame::where('id_user', Auth::id())->where('id_game', $game->id_game)->exists();
 
+        $steamDescription = $this->steamDescription($game);
+
         return view('search.detail-game', [
             'title' => $title,
             'image' => $image,
-            'description' => $descriptions[$title] ?? $defaultDescription,
+            'description' => $steamDescription ?? ($descriptions[$title] ?? $defaultDescription),
             'gameId' => $game?->id_game,
             'inLibrary' => $inLibrary,
             'isAuthed' => Auth::check(),
         ]);
+    }
+
+    private function steamDescription(?Game $game): ?string
+    {
+        if ($game === null || $game->steam_appid === null) {
+            return null;
+        }
+
+        $detail = $this->steam->detail($game->steam_appid);
+
+        return $detail['description'] ?? null;
     }
 }

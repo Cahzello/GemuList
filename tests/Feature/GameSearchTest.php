@@ -6,18 +6,16 @@ use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
-    config(['services.rawg.key' => 'test-key']);
-});
-
-it('imports games from RAWG when the local search is empty', function () {
+it('imports games from Steam when the local search is empty', function () {
     Http::fake([
-        'api.rawg.io/api/games*' => Http::response([
-            'results' => [
-                ['name' => 'Cyberpunk 2077', 'background_image' => 'https://example.com/cp2077.jpg'],
-                ['name' => 'Starfield', 'background_image' => 'https://example.com/starfield.jpg'],
+        'store.steampowered.com/api/storesearch*' => Http::response([
+            'items' => [
+                ['name' => 'Cyberpunk 2077', 'id' => 1091500, 'type' => 'app', 'tiny_image' => 'https://example.com/cp2077.jpg'],
+                ['name' => 'Starfield', 'id' => 1716770, 'type' => 'app', 'tiny_image' => 'https://example.com/starfield.jpg'],
+                ['name' => 'Soundtrack', 'id' => 123456, 'type' => 'sub', 'tiny_image' => 'https://example.com/sub.jpg'],
             ],
         ]),
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
     ]);
 
     $this->get(route('games.search', ['q' => 'cyber']))
@@ -25,14 +23,16 @@ it('imports games from RAWG when the local search is empty', function () {
         ->assertSee('Cyberpunk 2077');
 
     expect(Game::where('game_name', 'Cyberpunk 2077')->exists())->toBeTrue()
-        ->and(Game::where('game_name', 'Starfield')->exists())->toBeTrue();
+        ->and(Game::where('game_name', 'Cyberpunk 2077')->first()->steam_appid)->toBe(1091500)
+        ->and(Game::where('game_name', 'Starfield')->exists())->toBeTrue()
+        ->and(Game::where('game_name', 'Soundtrack')->exists())->toBeFalse();
 });
 
-it('does not call RAWG when the game is already stored locally', function () {
+it('does not call Steam when the game is already stored locally', function () {
     Game::factory()->create(['game_name' => 'Cyberpunk 2077']);
 
     Http::fake([
-        'api.rawg.io/api/games*' => Http::response([], 500),
+        'store.steampowered.com/api/storesearch*' => Http::response([], 500),
     ]);
 
     $this->get(route('games.search', ['q' => 'cyber']))
@@ -40,10 +40,10 @@ it('does not call RAWG when the game is already stored locally', function () {
         ->assertSee('Cyberpunk 2077');
 });
 
-it('skips RAWG and shows not found when the API key is missing', function () {
-    config(['services.rawg.key' => '']);
-
-    Http::fake();
+it('skips Steam and shows not found when the API request fails', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => Http::response([], 500),
+    ]);
 
     $this->get(route('games.search', ['q' => 'nothing-matches']))
         ->assertOk()

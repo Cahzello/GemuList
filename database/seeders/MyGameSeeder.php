@@ -35,7 +35,7 @@ class MyGameSeeder extends Seeder
             ['title' => 'Sekiro: Shadows Die Twice', 'status' => 'finished', 'score' => 9, 'review' => 'A razor-sharp test of patience and rhythm.', 'added_date' => '2025-03-09'],
             ['title' => 'Hollow Knight', 'status' => 'dropped', 'score' => 7, 'review' => 'Gorgeous atmosphere, but the map drained my patience.', 'added_date' => '2025-02-19'],
             ['title' => 'Celeste', 'status' => 'finished', 'score' => 8, 'review' => 'Tight platforming wrapped in a deeply human story.', 'added_date' => '2025-01-27'],
-            ['title' => 'Dark Souls III', 'status' => 'dropped', 'score' => 8, 'review' => 'Brilliant bosses, but I ran out of steam halfway.', 'added_date' => '2024-12-30'],
+            ['title' => 'DARK SOULS III', 'status' => 'dropped', 'score' => 8, 'review' => 'Brilliant bosses, but I ran out of steam halfway.', 'added_date' => '2024-12-30'],
             ['title' => 'Stardew Valley', 'status' => 'finished', 'score' => 8, 'review' => 'Cozy, charming and dangerously easy to sink hours into.', 'added_date' => '2024-11-18'],
             ['title' => 'Grand Theft Auto V', 'status' => 'progress', 'score' => 8, 'review' => 'Still the best sandbox out there.', 'added_date' => '2026-01-05'],
             ['title' => 'Detroit: Become Human', 'status' => 'planning', 'score' => 0, 'review' => '', 'added_date' => '2026-02-20'],
