@@ -123,6 +123,11 @@ class GameController extends Controller
 
         $game = Game::where('game_name', $title)->first();
 
+        if ($game === null) {
+            $this->importFromSteam($title);
+            $game = Game::where('game_name', $title)->first();
+        }
+
         $inLibrary = $game !== null && Auth::check()
             && MyGame::where('id_user', Auth::id())->where('id_game', $game->id_game)->exists();
 

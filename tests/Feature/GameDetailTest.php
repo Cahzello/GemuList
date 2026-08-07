@@ -48,3 +48,35 @@ it('clamps the description with an ellipsis when it is too long', function () {
         ->assertDontSee('Baca Selengkapnya')
         ->assertDontSee('descToggleBtn');
 });
+
+it('imports a game from Steam and enables the add button when it is not in the database', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => Http::response([
+            'items' => [
+                ['name' => 'Elden Ring', 'id' => 1245620, 'type' => 'app', 'tiny_image' => 'https://example.com/elden.jpg'],
+            ],
+        ]),
+        'store.steampowered.com/api/appdetails*' => Http::response([], 500),
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $this->get(route('games.detail', ['title' => 'Elden Ring', 'image' => 'https://example.com/elden.jpg']))
+        ->assertOk()
+        ->assertSee('Add to My Games')
+        ->assertDontSee('disabled aria-disabled="true"');
+
+    expect(Game::where('game_name', 'Elden Ring')->exists())->toBeTrue()
+        ->and(Game::where('game_name', 'Elden Ring')->first()->steam_appid)->toBe(1245620);
+});
+
+it('keeps the add button disabled when the game cannot be found on Steam', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => Http::response(['items' => []]),
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $this->get(route('games.detail', ['title' => 'Nonexistent Game', 'image' => 'https://example.com/nope.jpg']))
+        ->assertOk();
+
+    expect(Game::count())->toBe(0);
+});
