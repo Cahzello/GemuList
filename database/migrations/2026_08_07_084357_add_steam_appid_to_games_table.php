@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user', function (Blueprint $table) {
-            $table->unsignedInteger('id_user')->autoIncrement();
-            $table->string('username', 20);
-            $table->string('email', 40);
-            $table->string('password', 96);
-            $table->rememberToken();
+        Schema::table('games', function (Blueprint $table) {
+            $table->unsignedInteger('steam_appid')->nullable()->unique()->after('id_game');
         });
     }
 
@@ -25,6 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user');
+        Schema::table('games', function (Blueprint $table) {
+            $table->dropUnique(['steam_appid']);
+            $table->dropColumn('steam_appid');
+        });
     }
 };

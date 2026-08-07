@@ -9,8 +9,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator as ValidatorContract;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -30,11 +32,18 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('alert', $this->registrationAlert($validator));
+        }
 
         $user = User::create([
             'username' => $request->username,
@@ -46,6 +55,50 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('games.search', absolute: false));
+        return redirect(route('games.search', absolute: false))
+            ->with('alert', [
+                'type' => 'information',
+                'message' => 'Account created successfully!',
+            ]);
+    }
+
+    /**
+     * Build the alert payload for a failed registration.
+     *
+     * @return array{type: string, message: string}
+     */
+    private function registrationAlert(ValidatorContract $validator): array
+    {
+        $failed = $validator->failed();
+
+        if ($this->hasFailedRule($failed, 'Confirmed')) {
+            return ['type' => 'alert', 'message' => "Password Confirmation fields didn't match\nPlease try again!"];
+        }
+
+        if ($this->hasFailedRule($failed, 'Required')) {
+            return ['type' => 'alert', 'message' => 'Please complete all required fields !'];
+        }
+
+        if ($this->hasFailedRule($failed, 'Unique')) {
+            return ['type' => 'alert', 'message' => 'An account with this email address already exists !'];
+        }
+
+        return ['type' => 'alert', 'message' => "Failed to create an account.\nPlease try again!"];
+    }
+
+    /**
+     * Determine whether any field failed a given validation rule.
+     *
+     * @param  array<string, array<string, mixed>>  $failed
+     */
+    private function hasFailedRule(array $failed, string $rule): bool
+    {
+        foreach ($failed as $rules) {
+            if (array_key_exists($rule, $rules)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

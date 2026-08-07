@@ -4,6 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -31,6 +32,22 @@ class LoginRequest extends FormRequest
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        $response = $this->redirector->to($this->getRedirectUrl())
+            ->withErrors($validator, $this->errorBag)
+            ->withInput()
+            ->with('alert', [
+                'type' => 'alert',
+                'message' => 'Please complete all required fields !',
+            ]);
+
+        throw new ValidationException($validator, $response);
     }
 
     /**

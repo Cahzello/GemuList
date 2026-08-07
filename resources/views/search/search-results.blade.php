@@ -70,7 +70,7 @@
 
         @if ($games->isEmpty())
             <div class="p-12 text-center bg-[#1E1E1E] border border-[#FF6B35]/20 rounded-xl text-[#D0D0D0] font-['Inter',sans-serif] text-base">
-                <p class="m-0">Tidak ada game yang cocok dengan pencarian "{{ $keyword }}" di database maupun RAWG.</p>
+                <p class="m-0">Tidak ada game yang cocok dengan pencarian "{{ $keyword }}" di database maupun Steam.</p>
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-[20.8px]">
