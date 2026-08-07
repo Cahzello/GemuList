@@ -35,6 +35,27 @@ class SteamStoreService
     }
 
     /**
+     * @param  list<string>  $titles
+     * @return list<array{title: string, image: string}>
+     */
+    public function trending(array $titles): array
+    {
+        $trending = [];
+
+        foreach ($titles as $title) {
+            $results = $this->search($title);
+
+            if ($results === []) {
+                continue;
+            }
+
+            $trending[] = ['title' => $title, 'image' => $results[0]['image']];
+        }
+
+        return $trending;
+    }
+
+    /**
      * @return array{title: ?string, description: string, image: string, releaseDate: ?string, genres: list<string>}|null
      */
     public function detail(int $appId): ?array

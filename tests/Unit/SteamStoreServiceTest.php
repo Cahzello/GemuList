@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\SteamStoreService;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 
 it('maps Steam search results to title, image and steam_appid', function () {
@@ -97,4 +98,44 @@ it('returns null when the detail request fails', function () {
     ]);
 
     expect(app(SteamStoreService::class)->detail(1245620))->toBeNull();
+});
+
+it('resolves trending titles to curated titles with portrait covers', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => fn (Request $request) => match ($request['term']) {
+            'Elden Ring' => Http::response(['items' => [['name' => 'Elden Ring', 'id' => 1245620, 'type' => 'app', 'tiny_image' => null]]]),
+            'Cyberpunk 2077' => Http::response(['items' => [['name' => 'Cyberpunk 2077', 'id' => 1091500, 'type' => 'app', 'tiny_image' => 'https://example.com/cp.jpg']]]),
+            default => Http::response(['items' => []]),
+        },
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $trending = app(SteamStoreService::class)->trending(['Elden Ring', 'Cyberpunk 2077', 'Starfield']);
+
+    expect($trending)->toBe([
+        ['title' => 'Elden Ring', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg'],
+        ['title' => 'Cyberpunk 2077', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg'],
+    ]);
+});
+
+it('keeps the curated title even when Steam returns a renamed first hit', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => Http::response([
+            'items' => [['name' => 'Call of Duty®', 'id' => 1938090, 'type' => 'app', 'tiny_image' => null]],
+        ]),
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $trending = app(SteamStoreService::class)->trending(['Call of Duty']);
+
+    expect($trending[0]['title'])->toBe('Call of Duty')
+        ->and($trending[0]['image'])->toBe('https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1938090/library_600x900.jpg');
+});
+
+it('returns an empty array when no trending title is found on Steam', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => Http::response(['items' => []]),
+    ]);
+
+    expect(app(SteamStoreService::class)->trending(['Starfield', 'Halo']))->toBe([]);
 });
