@@ -12,34 +12,36 @@
         </div>
 
         <div
-            class="relative z-10 flex flex-col items-center justify-center min-h-screen pt-[95px] pb-[80px] px-6 text-center">
-            <h1
-                class="font-['Sora',sans-serif] font-extrabold text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight text-[#FF6B35]">
-                Level Up Your<br />
-                <span class="bg-gradient-to-r from-[#FF6B35] to-[#FF9F1C] bg-clip-text text-transparent">Gaming</span><br />
-                Library.
-            </h1>
+            class="relative z-10 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto min-h-screen pt-[95px] pb-[80px] px-6">
+            <div class="text-center lg:text-left">
+                <h1
+                    class="font-['Sora',sans-serif] font-extrabold text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight text-[#FF6B35]">
+                    Level Up Your<br />
+                    <span class="bg-gradient-to-r from-[#FF6B35] to-[#FF9F1C] bg-clip-text text-transparent">Gaming</span><br />
+                    Library.
+                </h1>
 
-            <p class="mt-4 max-w-[448px] font-['Inter',sans-serif] text-base sm:text-lg leading-relaxed text-[#D0D0D0]">
-                Sign up now to start collecting, rating,<br class="hidden sm:block" />
-                and discovering your new favorite games<br class="hidden sm:block" />
-                in the most advanced game database.
-            </p>
+                <p class="mt-4 max-w-[448px] mx-auto lg:mx-0 font-['Inter',sans-serif] text-base sm:text-lg leading-relaxed text-[#D0D0D0]">
+                    Sign up now to start collecting, rating, and discovering your new favorite games in the most
+                    advanced game database.
+                </p>
 
-            <div class="mt-10 flex items-center flex-wrap justify-center gap-4">
-                <div class="flex items-center">
-                    <button type="button"
-                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#FF6B35]/60 bg-[#1E1E1E] hover:bg-[#FF6B35]/20 hover:scale-110 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl cursor-pointer"
-                        title="Gaming Console">🎮</button>
-                    <button type="button"
-                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#FF6B35]/60 bg-[#1E1E1E] hover:bg-[#FF6B35]/20 hover:scale-110 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl cursor-pointer -ml-2 z-10"
-                        title="Arcade Games">🕹️</button>
-                    <button type="button"
-                        class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#FF6B35]/60 bg-[#1E1E1E] hover:bg-[#FF6B35]/20 hover:scale-110 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl cursor-pointer -ml-2 z-20"
-                        title="Video Games">💾</button>
-                </div>
+                @auth
+                    <a href="{{ route('games.search') }}"
+                        class="mt-10 inline-block px-8 py-3.5 rounded-full bg-[#FF6B35] text-white font-['Sora',sans-serif] font-semibold text-lg hover:bg-[#e85a26] hover:shadow-[0_0_30px_rgba(255,107,53,0.5)] transition-all duration-300">
+                        Explore Games
+                    </a>
+                @else
+                    <a href="{{ route('register') }}"
+                        class="mt-10 inline-block px-8 py-3.5 rounded-full bg-[#FF6B35] text-white font-['Sora',sans-serif] font-semibold text-lg hover:bg-[#e85a26] hover:shadow-[0_0_30px_rgba(255,107,53,0.5)] transition-all duration-300">
+                        Sign Up
+                    </a>
+                @endauth
+            </div>
 
-                <p class="font-['Inter',sans-serif] text-sm text-[#A0A0A0]">Join +10,000 gamers today</p>
+            <div class="flex justify-center lg:justify-end">
+                <img src="{{ asset('images/gemulist-product.png') }}" alt="GemuList product screenshot"
+                    class="w-full max-w-xl h-auto rounded-2xl border border-[#FF6B35]/20 shadow-[0_20px_60px_rgba(255,107,53,0.25)]" />
             </div>
         </div>
     </div>
