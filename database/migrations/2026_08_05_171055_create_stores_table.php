@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->unsignedInteger('id_store')->autoIncrement();
-            $table->string('store_name', 20);
-            $table->string('banner', 60);
-            $table->string('logo', 60);
-            $table->string('icon', 60);
-            $table->string('url', 120);
+            $table->string('store_name', 30);
+            $table->string('banner', 80);
+            $table->string('logo', 80);
+            $table->string('icon', 80);
+            $table->string('url', 60);
         });
     }
 

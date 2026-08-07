@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedInteger('id_user')->autoIncrement();
             $table->string('username', 20);
             $table->string('email', 40);
-            $table->string('password', 40);
+            $table->string('password', 96);
             $table->rememberToken();
         });
     }
