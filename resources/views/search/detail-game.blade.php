@@ -60,9 +60,9 @@
         </div>
 
         {{-- Right Column: Title, Description, and Action Button --}}
-        <div class="flex flex-col justify-between items-center lg:items-start h-auto lg:h-[350px] max-w-[650px] w-full">
+        <div class="flex flex-col justify-between items-center lg:items-start h-[280px] sm:h-[350px] max-w-[650px] w-full">
             <h1 class="mt-0 lg:-mt-1 mb-4 font-['Sora',sans-serif] font-extrabold text-3xl sm:text-4xl lg:text-5xl leading-tight tracking-tight text-[#FF6B35]">{{ $title }}</h1>
-            <p class="m-0 font-['Inter',sans-serif] font-semibold text-base sm:text-lg leading-relaxed text-[#D0D0D0]">
+            <p class="m-0 min-h-0 font-['Inter',sans-serif] font-semibold text-base sm:text-lg leading-relaxed text-[#D0D0D0] line-clamp-6">
                 {{ $description }}
             </p>
             <div class="mt-6 lg:mt-auto flex">

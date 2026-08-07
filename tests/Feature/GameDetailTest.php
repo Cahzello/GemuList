@@ -38,3 +38,13 @@ it('falls back to the stored description when Steam has no data', function () {
         ->assertOk()
         ->assertSee('Rise, Tarnished, and be guided by grace');
 });
+
+it('clamps the description with an ellipsis when it is too long', function () {
+    Game::factory()->create(['game_name' => 'Elden Ring', 'steam_appid' => null]);
+
+    $this->get(route('games.detail', ['title' => 'Elden Ring', 'image' => 'https://example.com/elden.jpg']))
+        ->assertOk()
+        ->assertSee('line-clamp-6')
+        ->assertDontSee('Baca Selengkapnya')
+        ->assertDontSee('descToggleBtn');
+});
