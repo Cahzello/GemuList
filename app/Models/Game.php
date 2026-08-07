@@ -23,6 +23,7 @@ class Game extends Model
     protected $fillable = [
         'game_name',
         'thumbnail',
+        'steam_appid',
     ];
 
     /**

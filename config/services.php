@@ -35,9 +35,10 @@ return [
         ],
     ],
 
-    'rawg' => [
-        'url' => env('RAWG_URL', 'https://api.rawg.io/api'),
-        'key' => env('RAWG_API_KEY'),
+    'steamstore' => [
+        'url' => env('STEAMSTORE_URL', 'https://store.steampowered.com'),
+        'cc' => env('STEAMSTORE_CC', 'ID'),
+        'language' => env('STEAMSTORE_LANGUAGE', 'english'),
     ],
 
     'cheapshark' => [

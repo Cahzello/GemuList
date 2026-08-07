@@ -7,6 +7,8 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -24,7 +26,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
+        } catch (ValidationException $e) {
+            $alert = RateLimiter::tooManyAttempts($request->throttleKey(), 5)
+                ? ['type' => 'alert', 'message' => "Login failed.\nPlease try again!"]
+                : ['type' => 'alert', 'message' => "Invalid Email or Password\nPlease try again!"];
+
+            return back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('alert', $alert);
+        }
 
         $request->session()->regenerate();
 

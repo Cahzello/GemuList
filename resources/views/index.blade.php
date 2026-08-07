@@ -20,7 +20,8 @@
     </main>
 
     <x-footer />
-    
+
+    <x-alert-modal />
 </body>
 
 </html>

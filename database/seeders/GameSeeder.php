@@ -15,7 +15,10 @@ class GameSeeder extends Seeder
         foreach (config('games.list', []) as $game) {
             Game::updateOrCreate(
                 ['game_name' => $game['title']],
-                ['thumbnail' => $game['image']],
+                [
+                    'thumbnail' => $game['image'],
+                    'steam_appid' => $game['steam_appid'] ?? null,
+                ],
             );
         }
     }
