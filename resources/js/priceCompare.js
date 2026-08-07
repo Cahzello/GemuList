@@ -97,7 +97,7 @@ function renderResults(search) {
       card.innerHTML =
         '<img class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-[#232645]" src="' + game.thumbnail + '" alt="' + game.title + '">' +
         '<div class="flex flex-col gap-1 min-w-0">' +
-          '<span class="text-sm font-semibold text-[#F4F4F4] whitespace-nowrap overflow-hidden text-ellipsis">' + game.title + '</span>' +
+          '<span class="text-sm font-semibold text-[#F4F4F4] max-w-[280px] whitespace-nowrap overflow-hidden text-ellipsis">' + game.title + '</span>' +
           '<span class="text-xs text-[#C0C0C0]">Lowest Price : <span class="text-[#FF9F1C] font-semibold">' + formatRupiah(game.lowestPrice) + '</span></span>' +
         '</div>';
 
