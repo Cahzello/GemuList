@@ -109,10 +109,10 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 flex-wrap">
                     <div class="flex items-center gap-1 text-xs sm:text-sm">
                         <span class="text-muted">Already have an account?</span>
-                        <a href="{{ route('login') }}" class="font-semibold text-secondary hover:text-white hover:underline transition-colors">Sign In</a>
+                        <a href="{{ route('login') }}" class="font-semibold text-secondary hover:text-white hover:underline transition-colors">Login</a>
                     </div>
 
-                    <button type="submit" class="w-full sm:w-auto rounded bg-secondary px-8 py-2.5 text-primary font-bold shadow-lg shadow-secondary/20 hover-bright transition-all cursor-pointer">Sign Up</button>
+                    <button type="submit" class="w-full sm:w-auto rounded bg-secondary px-8 py-2.5 text-primary font-bold shadow-lg shadow-secondary/20 hover-bright transition-all cursor-pointer">Register</button>
                 </div>
             </form>
         </div>
