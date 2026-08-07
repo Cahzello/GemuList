@@ -6,13 +6,12 @@ use App\Models\Game;
 use App\Models\GamePrice;
 use App\Models\Store;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class CheapSharkService
 {
-    private const MAX_CANDIDATES = 10;
-
     public const STORE_HOMEPAGES = [
         'Steam' => 'https://store.steampowered.com',
         'GamersGate' => 'https://www.gamersgate.com',
@@ -66,52 +65,60 @@ class CheapSharkService
             });
     }
 
-    public function pricesFor(string $title): void
+    /**
+     * Fetch deals for a fuzzy title query in a single request and persist games and prices.
+     */
+    public function pricesFor(string $query): void
     {
         $rate = $this->exchangeRate->idr();
 
-        foreach ($this->findGames($title) as $candidate) {
+        $this->groupedDeals($query)->each(function (Collection $deals) use ($rate): void {
             try {
-                $deals = $this->dealsFor($candidate['external']);
+                $this->persistGroup($deals, $rate);
+            } catch (\Throwable $e) {
+                Log::warning('CheapShark price group failed', ['error' => $e->getMessage()]);
+            }
+        });
+    }
 
-                if ($deals === []) {
+    /**
+     * @param  Collection<int, array<string, mixed>>  $deals
+     */
+    private function persistGroup(Collection $deals, float $rate): void
+    {
+        $first = $deals->first();
+
+        if (! is_array($first) || (string) ($first['title'] ?? '') === '') {
+            return;
+        }
+
+        $game = $this->resolveGame($first);
+        $thumbnail = $this->validThumb($first['thumb'] ?? null);
+
+        if ($thumbnail !== '' && $thumbnail !== $game->thumbnail) {
+            $game->update(['thumbnail' => $thumbnail]);
+        }
+
+        foreach ($deals as $deal) {
+            try {
+                $store = $this->resolveStore($deal);
+
+                if ($store === null) {
                     continue;
                 }
 
-                $game = Game::updateOrCreate(
-                    ['game_name' => $candidate['external']],
-                    ['thumbnail' => $candidate['thumb'] ?? ''],
+                GamePrice::updateOrCreate(
+                    ['id_game' => $game->id_game, 'id_store' => $store->id_store],
+                    [
+                        'price' => round((float) ($deal['salePrice'] ?? 0) * $rate),
+                        'retailPrice' => round((float) ($deal['normalPrice'] ?? 0) * $rate),
+                        'dealUrl' => isset($deal['dealID'])
+                            ? 'https://www.cheapshark.com/redirect?dealID='.$deal['dealID']
+                            : null,
+                    ],
                 );
-
-                collect($deals)
-                    ->each(function (array $deal) use ($game, $rate): void {
-                        $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
-
-                        if ($store === null) {
-                            $this->syncStores();
-                            $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
-                        }
-
-                        if ($store === null) {
-                            return;
-                        }
-
-                        GamePrice::updateOrCreate(
-                            ['id_game' => $game->id_game, 'id_store' => $store->id_store],
-                            [
-                                'price' => round((float) ($deal['salePrice'] ?? 0) * $rate),
-                                'retailPrice' => round((float) ($deal['normalPrice'] ?? 0) * $rate),
-                                'dealUrl' => isset($deal['dealID'])
-                                    ? 'https://www.cheapshark.com/redirect?dealID='.$deal['dealID']
-                                    : null,
-                            ],
-                        );
-                    });
             } catch (\Throwable $e) {
-                Log::warning('CheapShark price sync failed', [
-                    'title' => $candidate['external'],
-                    'error' => $e->getMessage(),
-                ]);
+                Log::warning('CheapShark price deal failed', ['error' => $e->getMessage()]);
             }
         }
     }
@@ -121,92 +128,96 @@ class CheapSharkService
      */
     public function backfillDealUrls(string $title): void
     {
-        try {
-            $game = Game::where('game_name', $title)->first();
+        $game = Game::where('game_name', $title)->first();
 
-            if ($game === null) {
-                return;
+        if ($game === null) {
+            return;
+        }
+
+        $matching = collect($this->dealsForQuery($title))
+            ->filter(fn (array $deal): bool => strtolower((string) ($deal['title'] ?? '')) === strtolower($title));
+
+        foreach ($matching as $deal) {
+            $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
+
+            if ($store === null || ! isset($deal['dealID'])) {
+                continue;
             }
 
-            $response = $this->client()->get(config('services.cheapshark.url').'/games', ['title' => $title]);
-
-            if ($response->failed()) {
-                Log::warning('CheapShark game lookup failed (backfill)', ['title' => $title, 'status' => $response->status()]);
-
-                return;
-            }
-
-            $exact = collect($response->json())
-                ->firstWhere(fn (array $match): bool => strtolower((string) ($match['external'] ?? '')) === strtolower($title));
-
-            if ($exact === null) {
-                return;
-            }
-
-            foreach ($this->dealsFor($exact['external']) as $deal) {
-                $store = Store::where('cheapshark_id', (int) ($deal['storeID'] ?? 0))->first();
-
-                if ($store === null || ! isset($deal['dealID'])) {
-                    continue;
-                }
-
-                GamePrice::where('id_game', $game->id_game)
-                    ->where('id_store', $store->id_store)
-                    ->update(['dealUrl' => 'https://www.cheapshark.com/redirect?dealID='.$deal['dealID']]);
-            }
-        } catch (\Throwable $e) {
-            Log::warning('CheapShark deal url backfill failed', ['title' => $title, 'error' => $e->getMessage()]);
+            GamePrice::where('id_game', $game->id_game)
+                ->where('id_store', $store->id_store)
+                ->update(['dealUrl' => 'https://www.cheapshark.com/redirect?dealID='.$deal['dealID']]);
         }
     }
 
     /**
-     * @return list<array{external: string, thumb: string}>
+     * @return Collection<string, Collection<int, array<string, mixed>>>
      */
-    private function findGames(string $title): array
+    private function groupedDeals(string $query): Collection
     {
-        $response = $this->client()->get(config('services.cheapshark.url').'/games', ['title' => $title]);
+        return collect($this->dealsForQuery($query))
+            ->groupBy(function (array $deal): string {
+                $gameId = (int) ($deal['gameID'] ?? 0);
 
-        if ($response->failed()) {
-            Log::warning('CheapShark game lookup failed', ['title' => $title, 'status' => $response->status()]);
-
-            return [];
-        }
-
-        return collect($response->json())
-            ->filter(fn (array $match): bool => (string) ($match['external'] ?? '') !== '')
-            ->take(self::MAX_CANDIDATES)
-            ->map(fn (array $match): array => [
-                'external' => (string) $match['external'],
-                'thumb' => (string) ($match['thumb'] ?? ''),
-            ])
-            ->values()
-            ->all();
+                return $gameId !== 0 ? (string) $gameId : mb_strtolower(trim((string) ($deal['title'] ?? '')));
+            });
     }
 
     /**
      * @return list<array<string, mixed>>
      */
-    private function dealsFor(string $title): array
+    private function dealsForQuery(string $query): array
     {
-        $response = $this->client()->get(config('services.cheapshark.url').'/deals', ['title' => $title]);
+        $response = $this->client()->get(config('services.cheapshark.url').'/deals', ['title' => $query]);
 
         if ($response->failed()) {
-            Log::warning('CheapShark deals request failed', ['title' => $title, 'status' => $response->status()]);
+            Log::warning('CheapShark deals request failed', ['title' => $query, 'status' => $response->status()]);
 
             return [];
         }
 
-        $deals = collect($response->json());
+        return collect($response->json())
+            ->filter(fn (array $deal): bool => (string) ($deal['title'] ?? '') !== '')
+            ->values()
+            ->all();
+    }
 
-        if ($deals->isEmpty()) {
-            return [];
+    private function resolveGame(array $deal): Game
+    {
+        $appId = isset($deal['steamAppID']) ? (int) $deal['steamAppID'] : null;
+
+        if ($appId !== null) {
+            $existing = Game::where('steam_appid', $appId)->first();
+
+            if ($existing !== null) {
+                return $existing;
+            }
         }
 
-        $matching = $deals->filter(function (array $deal) use ($title): bool {
-            return strtolower((string) ($deal['external'] ?? $deal['internalName'] ?? '')) === strtolower($title);
-        });
+        return Game::firstOrCreate(
+            ['game_name' => mb_substr((string) $deal['title'], 0, 100)],
+            ['thumbnail' => $this->validThumb($deal['thumb'] ?? null)],
+        );
+    }
 
-        return $matching->isNotEmpty() ? $matching->values()->all() : $deals->values()->all();
+    private function resolveStore(array $deal): ?Store
+    {
+        $storeId = (int) ($deal['storeID'] ?? 0);
+        $store = Store::where('cheapshark_id', $storeId)->first();
+
+        if ($store === null) {
+            $this->syncStores();
+            $store = Store::where('cheapshark_id', $storeId)->first();
+        }
+
+        return $store;
+    }
+
+    private function validThumb(mixed $thumb): string
+    {
+        $thumb = is_string($thumb) ? trim($thumb) : '';
+
+        return $thumb !== '' && mb_strtolower($thumb) !== 'none' ? $thumb : '';
     }
 
     private function absoluteImage(?string $path): string

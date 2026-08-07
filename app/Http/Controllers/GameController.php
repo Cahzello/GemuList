@@ -8,6 +8,7 @@ use App\Services\SteamStoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class GameController extends Controller
@@ -38,19 +39,35 @@ class GameController extends Controller
             $games = $this->localGames($keyword);
         }
 
-        $trendingGames = Game::query()
-            ->whereIn('game_name', self::TRENDING_TITLES)
-            ->get()
-            ->sortBy(fn (Game $game) => array_search($game->game_name, self::TRENDING_TITLES))
-            ->values()
-            ->take(10)
-            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
+        $trendingGames = [];
+
+        if ($keyword === '') {
+            $trendingGames = Cache::remember('trending.games', now()->addHours(24), fn (): array => $this->trendingGames());
+        }
 
         return view('search.index', [
             'games' => $games,
             'keyword' => $keyword,
             'trendingGames' => $trendingGames,
         ]);
+    }
+
+    private function trendingGames(): array
+    {
+        $trending = $this->steam->trending(self::TRENDING_TITLES);
+
+        if ($trending !== []) {
+            return $trending;
+        }
+
+        return Game::query()
+            ->whereIn('game_name', self::TRENDING_TITLES)
+            ->get()
+            ->sortBy(fn (Game $game) => array_search($game->game_name, self::TRENDING_TITLES))
+            ->values()
+            ->take(10)
+            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail])
+            ->all();
     }
 
     private function localGames(string $keyword): Collection

@@ -2,6 +2,8 @@
 
 use App\Models\Game;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
@@ -103,4 +105,59 @@ it('skips Steam and shows not found when the API request fails', function () {
         ->assertSee('Tidak ada game yang cocok');
 
     expect(Game::count())->toBe(0);
+});
+
+it('shows trending games from the Steam API on the search page', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => fn (Request $request) => match ($request['term']) {
+            'Elden Ring' => Http::response(['items' => [['name' => 'Elden Ring', 'id' => 1245620, 'type' => 'app', 'tiny_image' => 'https://example.com/elden.jpg']]]),
+            default => Http::response(['items' => []]),
+        },
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $this->get(route('games.search'))
+        ->assertOk()
+        ->assertSee('Trending Now')
+        ->assertSee('Elden Ring');
+
+    expect(Cache::get('trending.games'))->toBe([
+        ['title' => 'Elden Ring', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg'],
+    ]);
+});
+
+it('caches the trending list so Steam search is only called once', function () {
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => fn (Request $request) => match ($request['term']) {
+            'Elden Ring' => Http::response(['items' => [['name' => 'Elden Ring', 'id' => 1245620, 'type' => 'app', 'tiny_image' => null]]]),
+            default => Http::response(['items' => []]),
+        },
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $this->get(route('games.search'))->assertOk();
+    $requestsAfterFirstLoad = count(Http::recorded());
+
+    $this->get(route('games.search'))->assertOk();
+
+    expect(count(Http::recorded()))->toBe($requestsAfterFirstLoad);
+});
+
+it('falls back to the local library when the Steam API is unavailable', function () {
+    Game::factory()->create([
+        'game_name' => 'Elden Ring',
+        'thumbnail' => 'https://example.com/elden-local.jpg',
+    ]);
+
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => Http::response([], 500),
+    ]);
+
+    $this->get(route('games.search'))
+        ->assertOk()
+        ->assertSee('Elden Ring');
+
+    expect(Cache::get('trending.games'))->toBe([
+        ['title' => 'Elden Ring', 'image' => 'https://example.com/elden-local.jpg'],
+    ]);
 });
