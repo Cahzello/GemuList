@@ -25,7 +25,7 @@
                 <div class="user-dropdown" id="userDropdown">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="logout-btn">
+                        <button type="button" data-confirm-trigger class="logout-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -54,13 +54,15 @@
             <div class="mobile-nav-link">{{ Auth::user()->username }}</div>
             <form method="POST" action="{{ route('logout') }}" class="m-0">
                 @csrf
-                <button type="submit" class="mobile-nav-link w-full text-left m-0 cursor-pointer">Logout</button>
+                <button type="button" data-confirm-trigger class="mobile-nav-link w-full text-left m-0 cursor-pointer">Logout</button>
             </form>
         @else
             <a href="{{ route('login') }}" class="mobile-nav-link">Login</a>
         @endauth
     </div>
 </nav>
+
+<x-confirm-dialog />
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
