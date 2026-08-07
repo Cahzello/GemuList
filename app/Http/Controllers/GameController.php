@@ -42,7 +42,7 @@ class GameController extends Controller
         $trendingGames = [];
 
         if ($keyword === '') {
-            $trendingGames = Cache::remember('trending.games', now()->addHours(24), fn (): array => $this->trendingGames());
+            $trendingGames = Cache::remember('trending.games.v2', now()->addHours(24), fn (): array => $this->trendingGames());
         }
 
         return view('search.index', [
@@ -66,7 +66,11 @@ class GameController extends Controller
             ->sortBy(fn (Game $game) => array_search($game->game_name, self::TRENDING_TITLES))
             ->values()
             ->take(10)
-            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail])
+            ->map(fn (Game $game): array => [
+                'title' => $game->game_name,
+                'image' => $game->thumbnail,
+                'steam_appid' => $game->steam_appid,
+            ])
             ->all();
     }
 
@@ -78,7 +82,11 @@ class GameController extends Controller
             })
             ->orderBy('game_name')
             ->get()
-            ->map(fn (Game $game): array => ['title' => $game->game_name, 'image' => $game->thumbnail]);
+            ->map(fn (Game $game): array => [
+                'title' => $game->game_name,
+                'image' => $game->thumbnail,
+                'steam_appid' => $game->steam_appid,
+            ]);
     }
 
     private function importFromSteam(string $keyword): void
@@ -121,12 +129,8 @@ class GameController extends Controller
 
         $defaultDescription = "Navigate the digital sprawl of Neo-Saitama in this high-octane tactical RPG. As a rogue console cowboy, you'll need to optimize your hardware and manage your reputation among the warring megacorps. Every decision impacts your trajectory through the electrified underbelly of the city.";
 
-        $game = Game::where('game_name', $title)->first();
-
-        if ($game === null) {
-            $this->importFromSteam($title);
-            $game = Game::where('game_name', $title)->first();
-        }
+        $appId = $request->query('appid');
+        $game = $this->resolveGame($title, is_numeric($appId) ? (int) $appId : null);
 
         $inLibrary = $game !== null && Auth::check()
             && MyGame::where('id_user', Auth::id())->where('id_game', $game->id_game)->exists();
@@ -140,6 +144,40 @@ class GameController extends Controller
             'gameId' => $game?->id_game,
             'inLibrary' => $inLibrary,
             'isAuthed' => Auth::check(),
+        ]);
+    }
+
+    private function resolveGame(string $title, ?int $appId): ?Game
+    {
+        if ($appId !== null) {
+            return Game::query()
+                ->where('steam_appid', $appId)
+                ->first()
+                ?? $this->importByAppId($appId);
+        }
+
+        $game = Game::where('game_name', $title)->first();
+
+        if ($game === null) {
+            $this->importFromSteam($title);
+            $game = Game::where('game_name', $title)->first();
+        }
+
+        return $game;
+    }
+
+    private function importByAppId(int $appId): ?Game
+    {
+        $detail = $this->steam->detail($appId);
+
+        if ($detail === null) {
+            return null;
+        }
+
+        return Game::create([
+            'game_name' => mb_substr($detail['title'] ?? (string) $appId, 0, 100),
+            'thumbnail' => $detail['image'],
+            'steam_appid' => $appId,
         ]);
     }
 

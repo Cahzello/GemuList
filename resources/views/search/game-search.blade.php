@@ -79,7 +79,7 @@
             <div id="glCarouselViewport" class="w-full overflow-hidden py-2">
                 <div id="glCarouselGrid" class="flex flex-nowrap gap-5 transition-transform duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]">
                     @foreach ($games as $game)
-                        <a href="{{ route('games.detail', ['title' => $game['title'], 'image' => $game['image']]) }}" class="group relative shrink-0 w-full sm:w-[calc((100%-20px)/2)] md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-80px)/5)] aspect-[224/298] bg-[#1E1E1E] rounded-xl overflow-hidden translate-z-0 flex transition-transform duration-250 hover:-translate-y-1.5 no-underline text-inherit">
+                        <a href="{{ route('games.detail', ['title' => $game['title'], 'appid' => $game['steam_appid'] ?? null, 'image' => $game['image']]) }}" class="group relative shrink-0 w-full sm:w-[calc((100%-20px)/2)] md:w-[calc((100%-40px)/3)] lg:w-[calc((100%-80px)/5)] aspect-[224/298] bg-[#1E1E1E] rounded-xl overflow-hidden translate-z-0 flex transition-transform duration-250 hover:-translate-y-1.5 no-underline text-inherit">
 
                             <div class="absolute inset-0 w-full h-full m-0 p-0 rounded-[inherit] overflow-hidden">
                                 <img src="{{ $game['image'] }}" alt="{{ $game['title'] }}" loading="lazy" class="w-full h-full object-cover block rounded-[inherit] transition-transform duration-400 group-hover:scale-105">

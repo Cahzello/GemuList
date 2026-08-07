@@ -113,8 +113,8 @@ it('resolves trending titles to curated titles with portrait covers', function (
     $trending = app(SteamStoreService::class)->trending(['Elden Ring', 'Cyberpunk 2077', 'Starfield']);
 
     expect($trending)->toBe([
-        ['title' => 'Elden Ring', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg'],
-        ['title' => 'Cyberpunk 2077', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg'],
+        ['title' => 'Elden Ring', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg', 'steam_appid' => 1245620],
+        ['title' => 'Cyberpunk 2077', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/library_600x900.jpg', 'steam_appid' => 1091500],
     ]);
 });
 
@@ -129,7 +129,8 @@ it('keeps the curated title even when Steam returns a renamed first hit', functi
     $trending = app(SteamStoreService::class)->trending(['Call of Duty']);
 
     expect($trending[0]['title'])->toBe('Call of Duty')
-        ->and($trending[0]['image'])->toBe('https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1938090/library_600x900.jpg');
+        ->and($trending[0]['image'])->toBe('https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1938090/library_600x900.jpg')
+        ->and($trending[0]['steam_appid'])->toBe(1938090);
 });
 
 it('returns an empty array when no trending title is found on Steam', function () {

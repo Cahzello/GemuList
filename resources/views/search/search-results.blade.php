@@ -75,7 +75,7 @@
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-[20.8px]">
                 @foreach ($games as $game)
-                    <a href="{{ route('games.detail', ['title' => $game['title'], 'image' => $game['image']]) }}" class="group relative w-full aspect-[224/298] bg-[#1E1E1E] rounded-xl overflow-hidden translate-z-0 flex transition-transform duration-250 hover:-translate-y-1.5 no-underline text-inherit">
+                    <a href="{{ route('games.detail', ['title' => $game['title'], 'appid' => $game['steam_appid'] ?? null, 'image' => $game['image']]) }}" class="group relative w-full aspect-[224/298] bg-[#1E1E1E] rounded-xl overflow-hidden translate-z-0 flex transition-transform duration-250 hover:-translate-y-1.5 no-underline text-inherit">
 
                         <div class="absolute inset-0 w-full h-full m-0 p-0 rounded-[inherit] overflow-hidden">
                             <img src="{{ $game['image'] }}" alt="{{ $game['title'] }}" loading="lazy" class="w-full h-full object-cover block rounded-[inherit] transition-transform duration-400 group-hover:scale-105">

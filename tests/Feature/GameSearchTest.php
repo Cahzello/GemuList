@@ -121,9 +121,25 @@ it('shows trending games from the Steam API on the search page', function () {
         ->assertSee('Trending Now')
         ->assertSee('Elden Ring');
 
-    expect(Cache::get('trending.games'))->toBe([
-        ['title' => 'Elden Ring', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg'],
+    expect(Cache::get('trending.games.v2'))->toBe([
+        ['title' => 'Elden Ring', 'image' => 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg', 'steam_appid' => 1245620],
     ]);
+});
+
+it('ignores a stale trending cache that lacks a steam_appid', function () {
+    Cache::put('trending.games', [['title' => 'Elden Ring', 'image' => 'https://example.com/old.jpg']], now()->addHour());
+
+    Http::fake([
+        'store.steampowered.com/api/storesearch*' => fn (Request $request) => match ($request['term']) {
+            'Elden Ring' => Http::response(['items' => [['name' => 'Elden Ring', 'id' => 1245620, 'type' => 'app', 'tiny_image' => 'https://example.com/elden.jpg']]]),
+            default => Http::response(['items' => []]),
+        },
+        'shared.fastly.steamstatic.com/*' => Http::response(null, 200),
+    ]);
+
+    $this->get(route('games.search'))
+        ->assertOk()
+        ->assertSee('appid=1245620');
 });
 
 it('caches the trending list so Steam search is only called once', function () {
@@ -157,7 +173,7 @@ it('falls back to the local library when the Steam API is unavailable', function
         ->assertOk()
         ->assertSee('Elden Ring');
 
-    expect(Cache::get('trending.games'))->toBe([
-        ['title' => 'Elden Ring', 'image' => 'https://example.com/elden-local.jpg'],
+    expect(Cache::get('trending.games.v2'))->toBe([
+        ['title' => 'Elden Ring', 'image' => 'https://example.com/elden-local.jpg', 'steam_appid' => null],
     ]);
 });

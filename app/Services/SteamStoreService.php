@@ -36,7 +36,7 @@ class SteamStoreService
 
     /**
      * @param  list<string>  $titles
-     * @return list<array{title: string, image: string}>
+     * @return list<array{title: string, image: string, steam_appid: int}>
      */
     public function trending(array $titles): array
     {
@@ -49,7 +49,11 @@ class SteamStoreService
                 continue;
             }
 
-            $trending[] = ['title' => $title, 'image' => $results[0]['image']];
+            $trending[] = [
+                'title' => $title,
+                'image' => $results[0]['image'],
+                'steam_appid' => $results[0]['steam_appid'],
+            ];
         }
 
         return $trending;
