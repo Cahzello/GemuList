@@ -8,10 +8,16 @@ use App\Services\CheapSharkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class PriceCompareController extends Controller
 {
+    private const QUERY_CACHE_TTL_HOURS = 6;
+
+    private const BACKFILL_CACHE_TTL_MINUTES = 30;
+
     public function __construct(private CheapSharkService $cheapshark) {}
 
     public function index(): View
@@ -23,27 +29,53 @@ class PriceCompareController extends Controller
     {
         $q = trim((string) $request->query('q', ''));
 
-        $games = $this->gamesWithPrices($q);
-
-        if ($q !== '' && $games->isEmpty()) {
-            $this->cheapshark->pricesFor($q);
-            $games = $this->gamesWithPrices($q);
-        }
-
         if ($q !== '') {
-            $missingDealUrls = Game::query()
-                ->whereHas('gamePrices', fn ($query) => $query->whereNull('dealUrl'))
-                ->where('game_name', 'like', "%{$q}%")
-                ->get();
-
-            $missingDealUrls->each(fn (Game $game) => $this->cheapshark->backfillDealUrls($game->game_name));
-
-            if ($missingDealUrls->isNotEmpty()) {
-                $games = $this->gamesWithPrices($q);
-            }
+            $this->refreshFromCheapShark($q);
+            $this->backfillMissingDealUrls($q);
         }
 
-        return response()->json(['games' => $games->values()]);
+        return response()->json(['games' => $this->gamesWithPrices($q)->values()]);
+    }
+
+    private function refreshFromCheapShark(string $q): void
+    {
+        $cacheKey = 'cheapshark.query.'.md5(mb_strtolower($q));
+
+        if (Cache::has($cacheKey)) {
+            return;
+        }
+
+        try {
+            $this->cheapshark->pricesFor($q);
+            Cache::put($cacheKey, true, now()->addHours(self::QUERY_CACHE_TTL_HOURS));
+        } catch (\Throwable $e) {
+            Log::warning('CheapShark price sync failed', ['query' => $q, 'error' => $e->getMessage()]);
+        }
+    }
+
+    private function backfillMissingDealUrls(string $q): void
+    {
+        $missingDealUrls = Game::query()
+            ->whereHas('gamePrices', fn ($query) => $query->whereNull('dealUrl'))
+            ->where('game_name', 'like', "%{$q}%")
+            ->get()
+            ->filter(fn (Game $game) => ! Cache::has($this->backfillCacheKey($game->id_game)))
+            ->take(3);
+
+        $missingDealUrls->each(function (Game $game): void {
+            try {
+                $this->cheapshark->backfillDealUrls($game->game_name);
+            } catch (\Throwable $e) {
+                Log::warning('CheapShark deal url backfill failed', ['title' => $game->game_name, 'error' => $e->getMessage()]);
+            }
+
+            Cache::put($this->backfillCacheKey($game->id_game), true, now()->addMinutes(self::BACKFILL_CACHE_TTL_MINUTES));
+        });
+    }
+
+    private function backfillCacheKey(int $gameId): string
+    {
+        return "cheapshark.backfill.{$gameId}";
     }
 
     private function gamesWithPrices(string $q): Collection

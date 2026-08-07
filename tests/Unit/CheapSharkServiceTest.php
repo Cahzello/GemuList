@@ -12,6 +12,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Cache::flush();
+    Cache::put('usd_to_idr_rate', 16000, 3600);
 });
 
 it('syncs only the active CheapShark stores', function () {
@@ -44,22 +45,16 @@ it('stores real prices converted to IDR from deals', function () {
     ]);
 
     Http::fake([
-        'www.cheapshark.com/api/1.0/games*' => Http::response([
-            ['external' => 'Elden Ring', 'thumb' => 'https://example.com/elden.jpg'],
-        ]),
         'www.cheapshark.com/api/1.0/deals*' => Http::response([
             [
                 'dealID' => 'abc123deal',
-                'external' => 'Elden Ring',
                 'title' => 'Elden Ring',
+                'thumb' => 'https://example.com/elden.jpg',
+                'gameID' => 236717,
                 'storeID' => 1,
                 'salePrice' => '10.00',
                 'normalPrice' => '59.99',
             ],
-        ]),
-        'open.er-api.com/*' => Http::response([
-            'result' => 'success',
-            'rates' => ['IDR' => 16000],
         ]),
     ]);
 
@@ -80,7 +75,7 @@ it('stores real prices converted to IDR from deals', function () {
 
 it('does nothing when the game is not found on CheapShark', function () {
     Http::fake([
-        'www.cheapshark.com/api/1.0/games*' => Http::response([]),
+        'www.cheapshark.com/api/1.0/deals*' => Http::response([]),
     ]);
 
     app(CheapSharkService::class)->pricesFor('Unknown Game');
@@ -89,37 +84,38 @@ it('does nothing when the game is not found on CheapShark', function () {
         ->and(GamePrice::count())->toBe(0);
 });
 
-it('stores prices for multiple candidate games from a query', function () {
+it('stores deals with long encoded deal ids without truncating the deal url', function () {
+    Store::factory()->create([
+        'cheapshark_id' => 1,
+        'store_name' => 'Steam',
+    ]);
+
+    $longDealId = str_repeat('A', 80);
+
+    Http::fake([
+        'www.cheapshark.com/api/1.0/deals*' => Http::response([
+            ['dealID' => $longDealId, 'title' => 'Elden Ring', 'gameID' => 236717, 'storeID' => 1, 'thumb' => 'https://example.com/elden.jpg', 'salePrice' => '10.00', 'normalPrice' => '59.99'],
+        ]),
+    ]);
+
+    app(CheapSharkService::class)->pricesFor('Elden Ring');
+
+    $game = Game::where('game_name', 'Elden Ring')->first();
+
+    expect(GamePrice::where('id_game', $game->id_game)->first()->dealUrl)
+        ->toBe('https://www.cheapshark.com/redirect?dealID='.$longDealId);
+});
+
+it('stores prices for multiple games from a single deals query', function () {
     Store::factory()->create([
         'cheapshark_id' => 1,
         'store_name' => 'Steam',
     ]);
 
     Http::fake([
-        'www.cheapshark.com/api/1.0/games*' => Http::response([
-            ['external' => 'Far Cry 3', 'thumb' => 'https://example.com/fc3.jpg'],
-            ['external' => 'Far Cry 4', 'thumb' => 'https://example.com/fc4.jpg'],
-        ]),
-        'www.cheapshark.com/api/1.0/deals*' => function ($request) {
-            $title = $request->data()['title'] ?? '';
-
-            if ($title === 'Far Cry 3') {
-                return Http::response([
-                    ['external' => 'Far Cry 3', 'title' => 'Far Cry 3', 'storeID' => 1, 'salePrice' => '10.00', 'normalPrice' => '19.99'],
-                ]);
-            }
-
-            if ($title === 'Far Cry 4') {
-                return Http::response([
-                    ['external' => 'Far Cry 4', 'title' => 'Far Cry 4', 'storeID' => 1, 'salePrice' => '20.00', 'normalPrice' => '29.99'],
-                ]);
-            }
-
-            return Http::response([]);
-        },
-        'open.er-api.com/*' => Http::response([
-            'result' => 'success',
-            'rates' => ['IDR' => 16000],
+        'www.cheapshark.com/api/1.0/deals*' => Http::response([
+            ['dealID' => 'deal-fc3', 'title' => 'Far Cry 3', 'gameID' => 1, 'storeID' => 1, 'thumb' => 'https://example.com/fc3.jpg', 'salePrice' => '10.00', 'normalPrice' => '19.99'],
+            ['dealID' => 'deal-fc4', 'title' => 'Far Cry 4', 'gameID' => 2, 'storeID' => 1, 'thumb' => 'https://example.com/fc4.jpg', 'salePrice' => '20.00', 'normalPrice' => '29.99'],
         ]),
     ]);
 
