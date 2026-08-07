@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->unsignedInteger('id_store')->autoIncrement();
             $table->string('store_name', 20);
-            $table->string('banner', 255);
-            $table->string('logo', 255);
-            $table->string('icon', 255);
-            $table->string('url', 255);
+            $table->string('banner', 60);
+            $table->string('logo', 60);
+            $table->string('icon', 60);
+            $table->string('url', 120);
         });
     }
 

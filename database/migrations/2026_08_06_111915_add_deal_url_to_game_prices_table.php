@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('game_prices', function (Blueprint $table) {
-            $table->string('dealUrl')->nullable()->after('retailPrice');
+            $table->string('dealUrl', 120)->nullable()->after('retailPrice');
         });
     }
 
