@@ -24,7 +24,8 @@
                         <div class="collection-list flex flex-col gap-4 p-0 flex-1 w-full">
                             <template x-for="(game, index) in paginatedGames" :key="game.id">
                                 <article
-                                    class="game-card relative flex flex-col sm:flex-row gap-5 sm:gap-6 p-4 sm:p-6 bg-[#1E1E1E] border border-white/10 rounded-2xl z-10 transition-all duration-200 hover:border-[#FF6B35]/40 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/50 w-full box-border"
+                                    class="game-card relative flex flex-col sm:flex-row gap-5 sm:gap-6 p-4 sm:p-6 bg-[#1E1E1E] border border-white/10 rounded-2xl transition-all duration-200 hover:border-[#FF6B35]/40 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/50 w-full box-border"
+                                    :class="game.dropdownOpen ? '!z-50' : '!z-10'"
                                     style="animation: fadeIn 0.3s ease">
                                     <div class="card-accent absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl"
                                         :style="'background:' + statusColor(game.status)"></div>
@@ -165,7 +166,7 @@
                                             <path d="M3 9L7 5L11 9" stroke="currentColor" stroke-width="1.5"
                                                 stroke-linecap="round" />
                                         </svg>
-                                        <span>A → 0</span>
+                                        <span>A → Z</span>
                                     </button>
                                     <button
                                         class="sort-btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border font-mono text-sm font-medium transition-all duration-200"
@@ -177,7 +178,7 @@
                                             <path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5"
                                                 stroke-linecap="round" />
                                         </svg>
-                                        <span>0 → A</span>
+                                        <span>Z → A</span>
                                     </button>
                                 </div>
                             </div>
