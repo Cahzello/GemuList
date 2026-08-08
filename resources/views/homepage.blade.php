@@ -34,7 +34,7 @@
                 @else
                     <a href="{{ route('register') }}"
                         class="mt-10 inline-block px-8 py-3.5 rounded-full bg-[#FF6B35] text-white font-['Sora',sans-serif] font-semibold text-lg hover:bg-[#e85a26] hover:shadow-[0_0_30px_rgba(255,107,53,0.5)] transition-all duration-300">
-                        Sign Up
+                        Register Now
                     </a>
                 @endauth
             </div>
