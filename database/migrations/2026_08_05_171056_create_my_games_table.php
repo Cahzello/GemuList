@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('my_games', function (Blueprint $table) {
             $table->unsignedInteger('id_myGame')->autoIncrement();
-            $table->string('status', 10);
-            $table->integer('score');
+            $table->string('status', 10);   
+            $table->tinyInteger('score');
             $table->string('review', 180);
             $table->date('added_date');
             $table->unsignedInteger('id_user');
